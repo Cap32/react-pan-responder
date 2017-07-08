@@ -1,8 +1,8 @@
 {
-  "name": "react-pan-responder",
+  "name": "react-pan-responder-view",
   "version": "0.0.0",
   "description": "React pan gesture responder component. Just like React Native PanResponder, but for browser",
-  "repository": "Cap32/react-pan-responder",
+  "repository": "Cap32/react-pan-responder-view",
   "scripts": {
     "start": "npm test -- --watchAll",
     "test": "cross-env BABEL_ENV=cjs jest",
