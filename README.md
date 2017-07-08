@@ -1,14 +1,8 @@
 # react-pan-responder
 
-React pan responder
+React pan gesture responder component. Just like React Native PanResponder, but for browser.
 
-
-## Installation
-
-```
-yarn add react-pan-responder
-```
-
+    Document is coming soon
 
 ## License
 

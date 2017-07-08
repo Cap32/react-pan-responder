@@ -1,7 +1,7 @@
 {
   "name": "react-pan-responder",
   "version": "0.0.0",
-  "description": "React pan responder",
+  "description": "React pan gesture responder component. Just like React Native PanResponder, but for browser",
   "repository": "Cap32/react-pan-responder",
   "scripts": {
     "start": "npm test -- --watchAll",
