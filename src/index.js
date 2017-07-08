@@ -7,8 +7,6 @@ import {
 	isFunction, supportCSSTouchActionPan, createEventOptions, passive,
 } from './utils';
 
-const REF = 'view';
-
 let isTouchable;
 
 const makeGetTouchInfo = (ev) => (key) =>
@@ -25,26 +23,26 @@ const getDefaultGestureState = (options) => ({
 	...options,
 });
 
-export default class PandResponder extends Component {
+export default class PanResponderView extends Component {
 	static propTypes = {
 		style: PropTypes.object,
 		component: PropTypes.oneOfType([
 			PropTypes.string,
 			PropTypes.func,
 		]),
-		onPanResponderGrant: PropTypes.func,
-		onPanResponderMove: PropTypes.func,
-		onPanResponderRelease: PropTypes.func,
-		onStartShouldSetPanResponder: PropTypes.func,
-		onMoveShouldSetPanResponder: PropTypes.func,
-		onShouldBlockNativeResponder: PropTypes.func,
-
-		onTouchStart: PropTypes.func, // react original event
-		onMouseDown: PropTypes.func, // react original event
-
 		lockAxis: PropTypes.oneOf(Object.keys(LockAxis)),
 		capture: PropTypes.bool,
 		withRef: PropTypes.bool,
+
+		onStartShouldSetPanResponder: PropTypes.func,
+		onMoveShouldSetPanResponder: PropTypes.func,
+		onPanResponderGrant: PropTypes.func,
+		onPanResponderMove: PropTypes.func,
+		onPanResponderRelease: PropTypes.func,
+		onShouldStopPropagation: PropTypes.func,
+
+		onTouchStart: PropTypes.func, // react original event
+		onMouseDown: PropTypes.func, // react original event
 	};
 
 	static defaultProps = {
@@ -55,7 +53,7 @@ export default class PandResponder extends Component {
 		onPanResponderRelease: noop,
 		onStartShouldSetPanResponder: returnsTrue,
 		onMoveShouldSetPanResponder: returnsTrue,
-		onShouldBlockNativeResponder: returnsTrue,
+		onShouldStopPropagation: returnsTrue,
 		lockAxis: LockAxis.none,
 		capture: false,
 		withRef: false,
@@ -91,23 +89,22 @@ export default class PandResponder extends Component {
 		};
 	}
 
-	_refs = this.props.withRef ? { ref: REF } : {};
+	_refs = this.props.withRef ? { ref: (c) => (this.ref = c) } : {};
 
 	getInstance() {
-		return this.refs[REF];
+		return this.ref;
 	}
 
 	gestureState = {};
 
 	_capture = this.props.capture;
-	_isActive = false;
+	_isResponder = false;
 	_mostRecentTimeStamp = 0;
 	_lockingAxis = '';
-	_touchAction = null;
 
-	_handleShouldBlockNativeResponder = (ev, gestureState) => {
-		if (this.props.onShouldBlockNativeResponder(ev, gestureState)) {
-			!passive && ev.preventDefault();
+	_handleShouldBlock = (ev, gestureState) => {
+		!passive && ev.preventDefault();
+		if (this.props.onShouldStopPropagation(ev, gestureState)) {
 			ev.stopPropagation();
 			if (isFunction(ev.stopImmediatePropagation)) {
 				ev.stopImmediatePropagation();
@@ -115,7 +112,7 @@ export default class PandResponder extends Component {
 		}
 	};
 
-	_handleGrant(ev) {
+	_handleStart(ev) {
 		const {
 			onStartShouldSetPanResponder,
 			onPanResponderGrant,
@@ -127,16 +124,16 @@ export default class PandResponder extends Component {
 			y0: getTouch('pageY'),
 		});
 
-		if (!this._isActive) {
-			this._isActive = onStartShouldSetPanResponder(ev, this.gestureState);
+		if (!this._isResponder) {
+			this._isResponder = onStartShouldSetPanResponder(ev, this.gestureState);
 		}
 
-		if (!this._isActive) { return; }
+		if (!this._isResponder) { return; }
 
 		this._lockingAxis = '';
 
 		onPanResponderGrant(ev, this.gestureState);
-		this._handleShouldBlockNativeResponder(ev, this.gestureState);
+		this._handleShouldBlock(ev, this.gestureState);
 
 		const options = createEventOptions(this._capture);
 
@@ -147,7 +144,7 @@ export default class PandResponder extends Component {
 	}
 
 	_handleMove(ev) {
-		if (!this._isActive) { return; }
+		if (!this._isResponder) { return; }
 
 		const {
 			props: {
@@ -176,7 +173,7 @@ export default class PandResponder extends Component {
 		gestureState.dy = nextDY;
 
 		this._mostRecentTimeStamp = timeStamp;
-		this._isActive = onMoveShouldSetPanResponder(ev, gestureState);
+		this._isResponder = onMoveShouldSetPanResponder(ev, gestureState);
 
 		if (lockAxis !== LockAxis.none) {
 			if (!this._lockingAxis) {
@@ -194,13 +191,13 @@ export default class PandResponder extends Component {
 			}
 		}
 
-		if (!this._isActive) {
+		if (!this._isResponder) {
 			this._removeMoveListeners();
 			return;
 		}
 
 		onPanResponderMove(ev, gestureState);
-		this._handleShouldBlockNativeResponder(ev, gestureState);
+		this._handleShouldBlock(ev, gestureState);
 	}
 
 	_handleRelease(ev) {
@@ -208,26 +205,25 @@ export default class PandResponder extends Component {
 
 		this._lockingAxis = '';
 
-		if (!this._isActive) { return; }
+		if (!this._isResponder) { return; }
 
 		const { onPanResponderRelease } = this.props;
 
-		this._isActive = false;
+		this._isResponder = false;
 		onPanResponderRelease(ev, this.gestureState);
-		this._handleShouldBlockNativeResponder(ev, this.gestureState);
 		this.gestureState = {};
 	}
 
 	_handleTouchStart = (ev) => {
 		const { onTouchStart } = this.props;
 		isTouchable = true;
-		this._handleGrant(ev);
+		this._handleStart(ev);
 		onTouchStart && onTouchStart(ev);
 	};
 
 	_handleMouseDown = (ev) => {
 		const { onMouseDown } = this.props;
-		isTouchable || this._handleGrant(ev);
+		isTouchable || this._handleStart(ev);
 		onMouseDown && onMouseDown(ev);
 	};
 
@@ -268,7 +264,7 @@ export default class PandResponder extends Component {
 				onPanResponderRelease,
 				onStartShouldSetPanResponder,
 				onMoveShouldSetPanResponder,
-				onShouldBlockNativeResponder,
+				onShouldStopPropagation,
 				style,
 				capture,
 				withRef,
