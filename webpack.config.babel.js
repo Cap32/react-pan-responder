@@ -6,32 +6,26 @@ const camelcase = require('lodash.camelcase');
 
 process.env.NODE_ENV = process.env.NODE_ENV || 'development';
 
-// const isDev = process.env.NODE_ENV === 'development';
-
+const isExample = process.env.BUILD_EXAMPLE;
 const PROJECT_PATH = __dirname;
 const inProject = (...args) => resolve(PROJECT_PATH, ...args);
 const inSrc = inProject.bind(null, 'src');
 const inTest = inProject.bind(null, 'test');
+const inExample = inProject.bind(null, 'example');
 const srcDir = inSrc();
 const testDir = inTest();
+const exampleDir = inExample();
 
 module.exports = (webpackEnv = {}) => {
 	const { minify } = webpackEnv;
 
 	const config = {
 		devtool: 'source-map',
-		entry: './src',
-		output: {
-			filename: `${name}${minify ? '.min' : ''}.js`,
-			path: resolve(__dirname, 'dist'),
-			library: camelcase(name),
-			libraryTarget: 'umd',
-		},
 		module: {
 			rules: [
 				{
 					test: /\.js$/,
-					include: [srcDir, testDir],
+					include: [srcDir, testDir, exampleDir],
 					loader: 'babel-loader',
 					options: {
 						presets: [
@@ -57,11 +51,51 @@ module.exports = (webpackEnv = {}) => {
 		resolveLoader: {
 			moduleExtensions: ['-loader'],
 		},
-		externals: {
-			react: 'React',
+
+		devServer: {
+			port: 3000,
+			contentBase: exampleDir,
+			// hot: true,
+			quiet: false,
+			noInfo: false,
+			stats: 'errors-only',
+			historyApiFallback: {
+				disableDotRule: true,
+			},
 		},
 	};
 
+	if (isExample) {
+		config.entry = './example';
+		config.output = {
+			filename: 'bundle.js',
+			path: resolve(__dirname, 'example'),
+		};
+		config.module.rules.push(
+			{
+				test: /\.scss$/,
+				include: exampleDir,
+				use: ['style', 'css', 'postcss', 'sass'],
+			},
+			{
+				test: /\.es$/,
+				include: exampleDir,
+				use: ['raw'],
+			},
+		);
+	}
+	else {
+		config.entry = './src';
+		config.output = {
+			filename: `${name}${minify ? '.min' : ''}.js`,
+			path: resolve(__dirname, 'dist'),
+			library: camelcase(name),
+			libraryTarget: 'umd',
+		};
+		config.externals = {
+			react: 'React',
+		};
+	}
 
 	if (minify) {
 		config.plugins.push(
