@@ -1,6 +1,6 @@
+/* eslint-disable max-len */
 
 import './styles.scss';
-import PropTypes from 'prop-types';
 import React, { Component } from 'react';
 import { render } from 'react-dom';
 import ReactLogo from './ReactLogo';
@@ -85,6 +85,34 @@ class App extends Component {
 					<SyntaxHighlighter style={docco}>
 						{exampleCode}
 					</SyntaxHighlighter>
+
+					<h2>Props</h2>
+
+					<table className="props">
+						<tbody>
+							<tr>
+								<th>Property</th>
+								<th>Type</th>
+								<th>Default</th>
+								<th>Required</th>
+								<th>Description</th>
+							</tr>
+							<tr>
+								<td>component</td>
+								<td>React Component</td>
+								<td>{`"div"`}</td>
+								<td>false</td>
+								<td>Wrapper component</td>
+							</tr>
+							<tr>
+								<td>onStartShouldSetPanResponder</td>
+								<td>Function</td>
+								<td>{'() => true'}</td>
+								<td>false</td>
+								<td>Does this view want to become responder on the start of a touch?</td>
+							</tr>
+						</tbody>
+					</table>
 				</div>
 			</div>
 		);

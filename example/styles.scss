@@ -25,8 +25,10 @@ li {
 }
 
 .pan {
+	width: 128px;
+	height: 128px;
 	position: absolute;
-	border-radius: 200px;
+	border-radius: 64px;
 	background-color: rgba(white, 0.2);
 }
 
@@ -73,5 +75,45 @@ li {
 	p {
 		color: #888;
 		font-weight: 300;
+	}
+}
+
+.props {
+	width: 100%;
+	padding-bottom: 36px;
+	border-spacing: 0;
+
+	tr:last-child td {
+		border-bottom-width: 0;
+	}
+
+	th, td {
+		padding: 0.5em;
+
+		&:first-child {
+			padding-left: 0;
+		}
+
+		&:last-child {
+			padding-right: 0;
+		}
+	}
+
+	th {
+		text-align: left;
+		font-size: 16px;
+		font-weight: 400;
+	}
+
+	td {
+		font-size: 15px;
+		font-weight: 300;
+		color: #888;
+		border-bottom: 1px solid #ddd;
+
+		&:first-child {
+			font-weight: 400;
+			color: #1abc9c;
+		}
 	}
 }
