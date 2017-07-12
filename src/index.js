@@ -5,6 +5,7 @@ import { noop, returnsTrue } from 'empty-functions';
 import LockAxis from './LockAxis';
 import {
 	isFunction, supportCSSTouchActionPan, createEventOptions, passive,
+	TouchActions,
 } from './utils';
 
 let isTouchable;
@@ -79,13 +80,13 @@ export default class PanResponderView extends Component {
 	}
 
 	_setStyle({ lockAxis, style }) {
-		if (!supportCSSTouchActionPan || lockAxis === LockAxis.none) {
+		if (!supportCSSTouchActionPan) {
 			return style;
 		}
 
 		return {
 			...style,
-			touchAction: lockAxis === LockAxis.x ? 'pan-x' : 'pan-y',
+			touchAction: TouchActions[lockAxis],
 		};
 	}
 
@@ -103,7 +104,7 @@ export default class PanResponderView extends Component {
 	_lockingAxis = '';
 
 	_handleShouldBlock = (ev, gestureState) => {
-		!passive && ev.preventDefault();
+		// !passive && ev.preventDefault();
 		if (this.props.onShouldStopPropagation(ev, gestureState)) {
 			ev.stopPropagation();
 			if (isFunction(ev.stopImmediatePropagation)) {
@@ -175,7 +176,10 @@ export default class PanResponderView extends Component {
 		this._mostRecentTimeStamp = timeStamp;
 		this._isResponder = onMoveShouldSetPanResponder(ev, gestureState);
 
-		if (lockAxis !== LockAxis.none) {
+		if (lockAxis === LockAxis.none) {
+			if (!passive) { ev.preventDefault(); }
+		}
+		else {
 			if (!this._lockingAxis) {
 				const absDX = Math.abs(nextDX);
 				const absDY = Math.abs(nextDY);
