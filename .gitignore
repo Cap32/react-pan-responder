@@ -12,3 +12,4 @@ node_modules
 dist
 lib
 es
+example/bundle.js

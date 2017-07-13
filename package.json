@@ -16,6 +16,9 @@
     "build:min": "cross-env NODE_ENV=production webpack --env.minify",
     "build": "run-p build:*",
     "example": "cross-env BUILD_EXAMPLE=true webpack-dev-server",
+    "deploy:build": "cross-env BUILD_EXAMPLE=true webpack --env.minify",
+    "deploy:github": "git-directory-deploy --directory example",
+    "deploy": "run-s deploy:*",
     "preversion": "npm test && npm run build"
   },
   "files": [
@@ -60,6 +63,7 @@
     "eslint-plugin-promise": "^3.5.0",
     "eslint-plugin-react": "^7.1.0",
     "eslint-plugin-standard": "^3.0.1",
+    "git-directory-deploy": "^1.5.1",
     "jest": "^20.0.4",
     "jsdom": "^9.11.0",
     "lodash.camelcase": "^4.3.0",
