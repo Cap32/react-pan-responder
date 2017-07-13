@@ -16,7 +16,7 @@
     "build:min": "cross-env NODE_ENV=production webpack --env.minify",
     "build": "run-p build:*",
     "example": "cross-env BUILD_EXAMPLE=true webpack-dev-server",
-    "deploy:build": "cross-env BUILD_EXAMPLE=true webpack --env.minify",
+    "deploy:build": "cross-env NODE_ENV=production BUILD_EXAMPLE=true webpack --env.minify",
     "deploy:github": "git-directory-deploy --directory example",
     "deploy": "run-s deploy:*",
     "preversion": "npm test && npm run build"

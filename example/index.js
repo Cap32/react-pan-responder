@@ -53,7 +53,7 @@ class App extends Component {
 	render() {
 		const { gestureState, anim } = this.state;
 		return (
-			<div>
+			<div className="container">
 				<div className="pan-view">
 					<PanResponderView
 						className="pan"

@@ -2,7 +2,6 @@
 const { resolve } = require('path');
 const webpack = require('webpack');
 const { name } = require('./package.json');
-const camelcase = require('lodash.camelcase');
 
 process.env.NODE_ENV = process.env.NODE_ENV || 'development';
 
@@ -54,6 +53,7 @@ module.exports = (webpackEnv = {}) => {
 
 		devServer: {
 			port: 3000,
+			host: '192.168.199.135',
 			contentBase: exampleDir,
 			// hot: true,
 			quiet: false,
@@ -89,7 +89,7 @@ module.exports = (webpackEnv = {}) => {
 		config.output = {
 			filename: `${name}${minify ? '.min' : ''}.js`,
 			path: resolve(__dirname, 'dist'),
-			library: camelcase(name),
+			library: 'ReactPanResponderView',
 			libraryTarget: 'umd',
 		};
 		config.externals = {
