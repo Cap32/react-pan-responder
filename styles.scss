@@ -1,0 +1,195 @@
+
+$color-text: #323232;
+$color-text-light: #666;
+
+* {
+	margin: 0;
+	padding: 0;
+	box-sizing: border-box;
+}
+
+html, body {
+	color: $color-text;
+	font: 21px/1.5 'Helvetica Neue', helvetica, sans-serif;
+}
+
+@media (max-width: 414px) {
+	html, body {
+		font-size: 4vw;
+	}
+}
+
+li {
+	list-style: none;
+}
+
+h1 {
+	font-weight: 600;
+	font-size: 1.4rem;
+}
+
+h2 {
+	font-weight: 600;
+	font-size: 1.2rem;
+}
+
+h3 {
+	font-weight: 500;
+	font-size: 1.125rem;
+}
+
+h4 {
+	font-weight: 500;
+	font-size: 1.075rem;
+}
+
+h5 {
+	font-weight: 500;
+	font-size: 1rem;
+}
+
+h6 {
+	font-weight: 500;
+	font-size: 1rem;
+	color: $color-text-light;
+}
+
+p {
+	font-size: 1rem;
+	color: $color-text;
+}
+
+code {
+	font-size: 0.875rem;
+}
+
+.pan-view {
+	height: 50vw;
+	min-height: 300px;
+	display: flex;
+	justify-content: center;
+	align-items: center;
+	position: relative;
+	background-color: #1abc9c;
+	color: #fff;
+}
+
+.pan {
+	width: 128px;
+	height: 128px;
+	position: absolute;
+	border-radius: 64px;
+	background-color: rgba(white, 0.2);
+}
+
+.logo {
+	width: 128px;
+	height: 128px;
+	pointer-events: none;
+}
+
+.logger {
+	position: absolute;
+	left: 20px;
+	top: 20px;
+	padding: 20px;
+	background-color: rgba(white, 0.2);
+	pointer-events: none;
+
+	li {
+		width: 100px;
+		text-overflow: ellipsis;
+		white-space: nowrap;
+		overflow: hidden;
+		font-weight: 300;
+		font-size: 0.72rem;
+	}
+}
+
+.doc {
+	width: 80%;
+	max-width: 800px;
+	margin: auto;
+	padding: 36px 0;
+
+	h1 {
+		margin: 1.2em 0;
+	}
+
+	h2 {
+		margin: 1.125em 0;
+	}
+
+	p {
+		color: $color-text-light;
+		font-weight: 300;
+	}
+
+	figure {
+		margin-left: -36px;
+		margin-right: -36px;
+		padding: 32px;
+		background-color: #f9f9f9;
+
+		> pre {
+			width: 100%;
+			background-color: #f9f9f9 !important;
+		}
+	}
+}
+
+.props-container {
+	width: 100%;
+	overflow-x: auto;
+}
+
+.props {
+	width: 100%;
+	padding-bottom: 36px;
+	border-spacing: 0;
+
+	tr:last-child td {
+		border-bottom-width: 0;
+	}
+
+	th, td {
+		padding: 0.5em;
+
+		&:first-child {
+			padding-left: 0;
+		}
+
+		&:last-child {
+			padding-right: 0;
+		}
+	}
+
+	th {
+		text-align: left;
+		font-weight: 400;
+	}
+
+	td {
+		font-size: 0.9rem;
+		font-weight: 300;
+		color: $color-text-light;
+		border-bottom: 1px solid #ddd;
+
+		&:first-child {
+			font-weight: 400;
+			color: #1abc9c;
+		}
+	}
+}
+
+.footer {
+	border-top: 1px solid rgba(black, 0.032);
+	background-color: #f4f4f4;
+
+	p {
+		padding: 32px 0;
+		text-align: center;
+		font-weight: 300;
+		color: $color-text-light;
+	}
+}
