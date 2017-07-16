@@ -60,6 +60,7 @@ class App extends Component {
 						onPanResponderGrant={this._handleGrant}
 						onPanResponderMove={this._handleMove}
 						onPanResponderRelease={this._handleRelease}
+						onStartShouldSetPanResponder={() => false}
 						component={AnimatedDiv}
 						style={{
 							transform: anim.getTranslateTransform(),

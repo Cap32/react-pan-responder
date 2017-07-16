@@ -2,6 +2,7 @@
 const { resolve } = require('path');
 const webpack = require('webpack');
 const { name } = require('./package.json');
+const getMyIp = require('get-my-ip');
 
 process.env.NODE_ENV = process.env.NODE_ENV || 'development';
 
@@ -53,7 +54,7 @@ module.exports = (webpackEnv = {}) => {
 
 		devServer: {
 			port: 3000,
-			host: '192.168.199.135',
+			host: getMyIp(),
 			contentBase: exampleDir,
 			// hot: true,
 			quiet: false,

@@ -174,7 +174,7 @@ code {
 	}
 
 	td {
-		font-size: 0.9rem;
+		font-size: 0.8rem;
 		font-weight: 300;
 		color: $color-text-light;
 		border-bottom: 1px solid #ddd;
@@ -182,6 +182,10 @@ code {
 		&:first-child {
 			font-weight: 400;
 			color: #1abc9c;
+		}
+
+		&:last-child {
+			font-size: 0.72rem;
 		}
 	}
 }
