@@ -26,8 +26,8 @@ export function getElementPath(event) {
 	const pathArr = [];
 	let el = event.target;
 	while (el) {
-		pathArr.unshift(el);
-		el = el.parentElement;
+		pathArr.push(el);
+		el = el.parentNode;
 	}
 	return pathArr;
 }

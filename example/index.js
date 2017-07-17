@@ -50,8 +50,23 @@ class App extends Component {
 
 	anim = new AnimatedValueXY();
 
-	_handleShouldStart = (ev, gestureState) => {
+	_handleShouldStartCapture = () => {
+		console.log('onStartShouldSetPanResponderCapture');
+		return false;
+	};
+
+	_handleShouldStart = () => {
 		console.log('onStartShouldSetPanResponder');
+		return false;
+	};
+
+	_handleShouldMoveCapture = () => {
+		console.log('onMoveShouldSetPanResponderCapture');
+		return false;
+	};
+
+	_handleShouldMove = () => {
+		console.log('onMoveShouldSetPanResponder');
 		return true;
 	};
 
@@ -103,7 +118,10 @@ class App extends Component {
 						onPanResponderMove={this._handleMove}
 						onPanResponderRelease={this._handleRelease}
 						onPanResponderEnd={this._handleEnd}
+						onStartShouldSetPanResponderCapture={this._handleShouldStartCapture}
 						onStartShouldSetPanResponder={this._handleShouldStart}
+						onMoveShouldSetPanResponderCapture={this._handleShouldMoveCapture}
+						onMoveShouldSetPanResponder={this._handleShouldMove}
 						component={AnimatedDiv}
 						style={{
 							transform: this.anim.getTranslateTransform(),

@@ -2,7 +2,7 @@
 import PropTypes from 'prop-types';
 import React, { Component } from 'react';
 import { findDOMNode } from 'react-dom';
-import { noop, returnsTrue } from 'empty-functions';
+import { noop, returnsTrue, returnsFalse } from 'empty-functions';
 import LockAxis from './LockAxis';
 import { supportCSSTouchActionPan, passive, TouchActions } from './utils';
 import delegation from './delegation';
@@ -15,10 +15,11 @@ export default class PanResponderView extends Component {
 			PropTypes.func,
 		]),
 		lockAxis: PropTypes.oneOf(Object.keys(LockAxis)),
-		capture: PropTypes.bool,
 		withRef: PropTypes.bool,
 
+		onStartShouldSetPanResponderCapture: PropTypes.func,
 		onStartShouldSetPanResponder: PropTypes.func,
+		onMoveShouldSetPanResponderCapture: PropTypes.func,
 		onMoveShouldSetPanResponder: PropTypes.func,
 		onPanResponderStart: PropTypes.func,
 		onPanResponderGrant: PropTypes.func,
@@ -36,11 +37,12 @@ export default class PanResponderView extends Component {
 		onPanResponderMove: noop,
 		onPanResponderRelease: noop,
 		onPanResponderEnd: noop,
+		onStartShouldSetPanResponderCapture: returnsFalse,
 		onStartShouldSetPanResponder: returnsTrue,
+		onMoveShouldSetPanResponderCapture: returnsFalse,
 		onMoveShouldSetPanResponder: returnsTrue,
 		onShouldStopPropagation: returnsTrue,
 		lockAxis: LockAxis.none,
-		capture: false,
 		withRef: false,
 	};
 
@@ -56,10 +58,12 @@ export default class PanResponderView extends Component {
 
 	componentDidMount() {
 		delegation.addListener(findDOMNode(this), {
+			onShouldStartCapture: this._handleShouldStartCapture,
 			onShouldStart: this._handleShouldStart,
+			onShouldMoveCapture: this._handleShouldMoveCapture,
+			onShouldMove: this._handleShouldMove,
 			onGrant: this._handleGrant,
 			onStart: this._handleStart,
-			onShouldMove: this._handleShouldMove,
 			onMove: this._handleMove,
 			onRelease: this._handleRelease,
 			onEnd: this._handleEnd,
@@ -94,8 +98,11 @@ export default class PanResponderView extends Component {
 		return this.ref;
 	}
 
-	_capture = this.props.capture;
 	_lockingAxis = '';
+
+	_handleShouldStartCapture = (...args) => {
+		return this.props.onStartShouldSetPanResponderCapture(...args);
+	};
 
 	_handleShouldStart = (...args) => {
 		return this.props.onStartShouldSetPanResponder(...args);
@@ -107,6 +114,10 @@ export default class PanResponderView extends Component {
 
 	_handleStart = (...args) => {
 		this.props.onPanResponderStart(...args);
+	};
+
+	_handleShouldMoveCapture = (...args) => {
+		return this.props.onMoveShouldSetPanResponderCapture(...args);
 	};
 
 	_handleShouldMove = (...args) => {
@@ -154,16 +165,17 @@ export default class PanResponderView extends Component {
 				component: Comp,
 				lockAxis,
 
+				onStartShouldSetPanResponderCapture,
+				onStartShouldSetPanResponder,
+				onMoveShouldSetPanResponderCapture,
+				onMoveShouldSetPanResponder,
 				onPanResponderGrant,
 				onPanResponderStart,
 				onPanResponderMove,
 				onPanResponderRelease,
 				onPanResponderEnd,
-				onStartShouldSetPanResponder,
-				onMoveShouldSetPanResponder,
 				onShouldStopPropagation,
 				style,
-				capture,
 				withRef,
 
 				...other,

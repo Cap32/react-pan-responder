@@ -28,6 +28,31 @@ const listeners = new WeakMap();
 
 let mostRecentTimeStamp = 0;
 
+const makeSetGrantedNode = (action) => (ev) => {
+	const findAndExec = (arr, methodName) => {
+		if (!grantedNode) {
+			for (const node of arr) {
+				if (listeners.has(node)) {
+					const handler = listeners.get(node);
+					if (handler[methodName](ev, gestureState)) {
+						grantedNode = node;
+						handler.onGrant(ev, gestureState);
+						break;
+					}
+				}
+			}
+		}
+	};
+
+	const elementPath = getElementPath(ev);
+	findAndExec(elementPath, `onShould${action}Capture`);
+	findAndExec(elementPath.reverse(), `onShould${action}`);
+	return grantedNode;
+};
+
+const setGrantedNodeOnStart = makeSetGrantedNode('Start');
+const setGrantedNodeOnMove = makeSetGrantedNode('Move');
+
 const makeGetTouchInfo = (ev) => (key) => {
 	const { touches } = ev;
 	if (!touches) { return ev[key]; }
@@ -73,19 +98,7 @@ const handleStart = (ev) => {
 		numberActiveTouches,
 	};
 
-	if (!grantedNode) {
-		for (const node of getElementPath(ev)) {
-			if (listeners.has(node)) {
-				const handler = listeners.get(node);
-				const shouldStart = handler.onShouldStart(ev, gestureState);
-				if (shouldStart) {
-					grantedNode = node;
-					handler.onGrant(ev, gestureState);
-					break;
-				}
-			}
-		}
-	}
+	grantedNode = setGrantedNodeOnStart(ev);
 
 	if (grantedNode) {
 		listeners.get(grantedNode).onStart(ev, gestureState);
@@ -119,18 +132,7 @@ const handleMove = (ev) => {
 
 	mostRecentTimeStamp = timeStamp;
 
-	if (!grantedNode) {
-		for (const node of getElementPath(ev)) {
-			if (listeners.has(node)) {
-				const handler = listeners.get(node);
-				const shouldMove = handler.onShouldMove(ev, gestureState);
-				if (shouldMove) {
-					grantedNode = node;
-					handler.onGrant(ev, gestureState);
-				}
-			}
-		}
-	}
+	grantedNode = setGrantedNodeOnMove(ev);
 
 	if (grantedNode) {
 		listeners.get(grantedNode).onMove(ev, gestureState);
@@ -163,12 +165,13 @@ const ensureWindowListener = () => {
 	if (hasWindowListener) { return; }
 
 	hasWindowListener = true;
-	window.addEventListener('mousedown', handleStart, createEventOptions(false));
-	window.addEventListener('mousemove', handleMove, createEventOptions(false));
-	window.addEventListener('mouseup', handleEnd, createEventOptions(false));
-	window.addEventListener('touchstart', handleStart, createEventOptions(false));
-	window.addEventListener('touchmove', handleMove, createEventOptions(false));
-	window.addEventListener('touchend', handleEnd, createEventOptions(false));
+	const eventOptions = createEventOptions(true);
+	window.addEventListener('mousedown', handleStart, eventOptions);
+	window.addEventListener('mousemove', handleMove, eventOptions);
+	window.addEventListener('mouseup', handleEnd, eventOptions);
+	window.addEventListener('touchstart', handleStart, eventOptions);
+	window.addEventListener('touchmove', handleMove, eventOptions);
+	window.addEventListener('touchend', handleEnd, eventOptions);
 };
 
 export default {
