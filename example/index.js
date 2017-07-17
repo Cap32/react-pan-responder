@@ -10,38 +10,61 @@ import githubGist from 'react-syntax-highlighter/dist/styles/github-gist';
 import exampleCode from './example.es';
 import PanResponderView from 'index';
 
-class App extends Component {
-	state = {
-		gestureState: {
-			x0: 0,
-			y0: 0,
-			moveX: 0,
-			moveY: 0,
-			dx: 0,
-			dy: 0,
-			vx: 0,
-			vy: 0,
-		},
-		anim: new AnimatedValueXY(),
+class Logger extends Component {
+	gestureState = {
+		x0: 0,
+		y0: 0,
+		moveX: 0,
+		moveY: 0,
+		dx: 0,
+		dy: 0,
+		vx: 0,
+		vy: 0,
 	};
 
+	update(gestureState) {
+		this.gestureState = { ...this.gestureState, ...gestureState };
+		this.forceUpdate();
+	}
+
+	render() {
+		const { gestureState } = this;
+		return (
+			<div className="logger">
+				<ul>
+					{Object.keys(gestureState).map((prop) =>
+						<li key={prop}>{prop}: {gestureState[prop]}</li>
+					)}
+				</ul>
+			</div>
+		);
+	}
+}
+
+class App extends Component {
+	shouldComponentUpdate() {
+		return false;
+	}
+
+	anim = new AnimatedValueXY();
+
 	_handleGrant = (ev, gestureState) => {
-		const { anim } = this.state;
+		const { anim, logger } = this;
 		anim.stopAnimation(({ x, y }) => {
 			anim.setOffset({ x, y });
 			anim.setValue({ x: 0, y: 0 });
-			this.setState({ gestureState });
+			logger.update(gestureState);
 		});
 	};
 
 	_handleMove = (ev, gestureState) => {
-		const { anim } = this.state;
+		const { anim, logger } = this;
 		anim.setValue({ x: gestureState.dx, y: gestureState.dy });
-		this.setState({ gestureState });
+		logger.update(gestureState);
 	};
 
 	_handleRelease = () => {
-		const { anim } = this.state;
+		const { anim } = this;
 		anim.flattenOffset();
 		spring(anim, {
 			toValue: 0,
@@ -51,7 +74,6 @@ class App extends Component {
 	};
 
 	render() {
-		const { gestureState, anim } = this.state;
 		return (
 			<div className="container">
 				<div className="pan-view">
@@ -63,18 +85,12 @@ class App extends Component {
 						onStartShouldSetPanResponder={() => false}
 						component={AnimatedDiv}
 						style={{
-							transform: anim.getTranslateTransform(),
+							transform: this.anim.getTranslateTransform(),
 						}}
 					>
 						<ReactLogo className="logo" />
 					</PanResponderView>
-					<div className="logger">
-						<ul>
-							{Object.keys(gestureState).map((prop) =>
-								<li key={prop}>{prop}: {gestureState[prop]}</li>
-							)}
-						</ul>
-					</div>
+					<Logger ref={(logger) => (this.logger = logger)} />
 				</div>
 
 				<div className="doc">
