@@ -171,11 +171,25 @@ class App extends Component {
 									<td>Does this view want to become responder on the start of a touch?</td>
 								</tr>
 								<tr>
+									<td>onStartShouldSetPanResponderCapture</td>
+									<td>Function</td>
+									<td>{'() => false'}</td>
+									<td>false</td>
+									<td>Just like `onStartShouldSetPanResponder`, but use capture</td>
+								</tr>
+								<tr>
 									<td>onMoveShouldSetPanResponder</td>
 									<td>Function</td>
 									<td>{'() => true'}</td>
 									<td>false</td>
 									<td>Called for every touch move on the View when it is not the responder</td>
+								</tr>
+								<tr>
+									<td>onMoveShouldSetPanResponderCapture</td>
+									<td>Function</td>
+									<td>{'() => false'}</td>
+									<td>false</td>
+									<td>Just like `onMoveShouldSetPanResponder`, but use capture</td>
 								</tr>
 								<tr>
 									<td>onPanResponderGrant</td>
@@ -185,11 +199,25 @@ class App extends Component {
 									<td>The View is now responding for touch events. This is the time to highlight and show the user what is happening</td>
 								</tr>
 								<tr>
+									<td>onPanResponderStart</td>
+									<td>Function</td>
+									<td>{'(ev, gestureState) => {}'}</td>
+									<td>false</td>
+									<td>Called for every touch start when it is the responder</td>
+								</tr>
+								<tr>
 									<td>onPanResponderMove</td>
 									<td>Function</td>
 									<td>{'(ev, gestureState) => {}'}</td>
 									<td>false</td>
-									<td>The user is moving their finger</td>
+									<td>Called for every touch move when it is the responder</td>
+								</tr>
+								<tr>
+									<td>onPanResponderEnd</td>
+									<td>Function</td>
+									<td>{'(ev, gestureState) => {}'}</td>
+									<td>false</td>
+									<td>Called for every touch end when it is the responder</td>
 								</tr>
 								<tr>
 									<td>onPanResponderRelease</td>
