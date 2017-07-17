@@ -3,7 +3,7 @@ import React from 'react';
 import jsdom from 'jsdom';
 import { mount } from 'enzyme';
 import { simulateTouchEvent, simulateMouseEvent } from './utils';
-import PanView, { undocumented_updateTouchSupport } from '../src';
+import PanView from '../src';
 
 let wrapper;
 
@@ -19,7 +19,6 @@ beforeEach(() => {
 
 afterEach(() => {
 	if (wrapper.unmount) { wrapper.unmount(); }
-	undocumented_updateTouchSupport();
 });
 
 describe('<PanView />', function () {

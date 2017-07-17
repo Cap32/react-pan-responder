@@ -2,10 +2,6 @@
 import passiveEvents from 'detect-passive-events';
 import LockAxis from './LockAxis';
 
-export function isFunction(s) {
-	return typeof s === 'function';
-}
-
 export const supportCSSTouchActionPan = (function () {
 	try { return CSS.supports('touch-action', 'pan-x'); }
 	catch (err) { return false; }
@@ -23,3 +19,15 @@ export const TouchActions = {
 	[LockAxis.x]: 'pan-y',
 	[LockAxis.y]: 'pan-x',
 };
+
+export function getElementPath(event) {
+	if (event.path) { return event.path; }
+
+	const pathArr = [];
+	let el = event.target;
+	while (el) {
+		pathArr.unshift(el);
+		el = el.parentElement;
+	}
+	return pathArr;
+}

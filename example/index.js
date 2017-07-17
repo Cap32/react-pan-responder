@@ -12,6 +12,7 @@ import PanResponderView from 'index';
 
 class Logger extends Component {
 	gestureState = {
+		stateID: Math.random(),
 		x0: 0,
 		y0: 0,
 		moveX: 0,
@@ -20,10 +21,11 @@ class Logger extends Component {
 		dy: 0,
 		vx: 0,
 		vy: 0,
+		numberActiveTouches: 0,
 	};
 
 	update(gestureState) {
-		this.gestureState = { ...this.gestureState, ...gestureState };
+		this.gestureState = gestureState;
 		this.forceUpdate();
 	}
 
@@ -48,7 +50,13 @@ class App extends Component {
 
 	anim = new AnimatedValueXY();
 
+	_handleShouldStart = (ev, gestureState) => {
+		console.log('onStartShouldSetPanResponder');
+		return true;
+	};
+
 	_handleGrant = (ev, gestureState) => {
+		console.log('onPanResponderGrant');
 		const { anim, logger } = this;
 		anim.stopAnimation(({ x, y }) => {
 			anim.setOffset({ x, y });
@@ -57,15 +65,26 @@ class App extends Component {
 		});
 	};
 
+	_handleStart = () => {
+		console.log('onPanResponderStart');
+	};
+
 	_handleMove = (ev, gestureState) => {
+		console.log('onPanResponderMove');
 		const { anim, logger } = this;
 		anim.setValue({ x: gestureState.dx, y: gestureState.dy });
 		logger.update(gestureState);
 	};
 
-	_handleRelease = () => {
-		const { anim } = this;
+	_handleEnd = () => {
+		console.log('onPanResponderEnd');
+	};
+
+	_handleRelease = (ev, gestureState) => {
+		console.log('onPanResponderRelease');
+		const { anim, logger } = this;
 		anim.flattenOffset();
+		logger.update(gestureState);
 		spring(anim, {
 			toValue: 0,
 			tension: 40,
@@ -80,9 +99,11 @@ class App extends Component {
 					<PanResponderView
 						className="pan"
 						onPanResponderGrant={this._handleGrant}
+						onPanResponderStart={this._handleStart}
 						onPanResponderMove={this._handleMove}
 						onPanResponderRelease={this._handleRelease}
-						onStartShouldSetPanResponder={() => false}
+						onPanResponderEnd={this._handleEnd}
+						onStartShouldSetPanResponder={this._handleShouldStart}
 						component={AnimatedDiv}
 						style={{
 							transform: this.anim.getTranslateTransform(),
