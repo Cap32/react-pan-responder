@@ -10,39 +10,96 @@ import githubGist from 'react-syntax-highlighter/dist/styles/github-gist';
 import exampleCode from './example.es';
 import PanResponderView from 'index';
 
+class Logger extends Component {
+	gestureState = {
+		stateID: Math.random(),
+		x0: 0,
+		y0: 0,
+		moveX: 0,
+		moveY: 0,
+		dx: 0,
+		dy: 0,
+		vx: 0,
+		vy: 0,
+		numberActiveTouches: 0,
+	};
+
+	update(gestureState) {
+		this.gestureState = gestureState;
+		this.forceUpdate();
+	}
+
+	render() {
+		const { gestureState } = this;
+		return (
+			<div className="logger">
+				<ul>
+					{Object.keys(gestureState).map((prop) =>
+						<li key={prop}>{prop}: {gestureState[prop]}</li>
+					)}
+				</ul>
+			</div>
+		);
+	}
+}
+
 class App extends Component {
-	state = {
-		gestureState: {
-			x0: 0,
-			y0: 0,
-			moveX: 0,
-			moveY: 0,
-			dx: 0,
-			dy: 0,
-			vx: 0,
-			vy: 0,
-		},
-		anim: new AnimatedValueXY(),
+	shouldComponentUpdate() {
+		return false;
+	}
+
+	anim = new AnimatedValueXY();
+
+	_handleShouldStartCapture = () => {
+		console.log('onStartShouldSetPanResponderCapture');
+		return false;
+	};
+
+	_handleShouldStart = () => {
+		console.log('onStartShouldSetPanResponder');
+		return false;
+	};
+
+	_handleShouldMoveCapture = () => {
+		console.log('onMoveShouldSetPanResponderCapture');
+		return false;
+	};
+
+	_handleShouldMove = () => {
+		console.log('onMoveShouldSetPanResponder');
+		return true;
 	};
 
 	_handleGrant = (ev, gestureState) => {
-		const { anim } = this.state;
+		console.log('onPanResponderGrant');
+		const { anim, logger } = this;
 		anim.stopAnimation(({ x, y }) => {
 			anim.setOffset({ x, y });
 			anim.setValue({ x: 0, y: 0 });
-			this.setState({ gestureState });
+			logger.update(gestureState);
 		});
 	};
 
-	_handleMove = (ev, gestureState) => {
-		const { anim } = this.state;
-		anim.setValue({ x: gestureState.dx, y: gestureState.dy });
-		this.setState({ gestureState });
+	_handleStart = () => {
+		console.log('onPanResponderStart');
 	};
 
-	_handleRelease = () => {
-		const { anim } = this.state;
+	_handleMove = (ev, gestureState) => {
+		console.log('onPanResponderMove');
+		const { anim, logger } = this;
+		anim.setValue({ x: gestureState.dx, y: gestureState.dy });
+		logger.update(gestureState);
+	};
+
+	_handleEnd = () => {
+		console.log('onPanResponderEnd');
+	};
+
+	_handleRelease = (ev, gestureState) => {
+		console.log('onPanResponderRelease');
+		const { anim, logger } = this;
 		anim.flattenOffset();
+		logger.update(gestureState);
 		spring(anim, {
 			toValue: 0,
 			tension: 40,
@@ -51,29 +108,28 @@ class App extends Component {
 	};
 
 	render() {
-		const { gestureState, anim } = this.state;
 		return (
 			<div className="container">
 				<div className="pan-view">
 					<PanResponderView
 						className="pan"
 						onPanResponderGrant={this._handleGrant}
+						onPanResponderStart={this._handleStart}
 						onPanResponderMove={this._handleMove}
 						onPanResponderRelease={this._handleRelease}
+						onPanResponderEnd={this._handleEnd}
+						onStartShouldSetPanResponderCapture={this._handleShouldStartCapture}
+						onStartShouldSetPanResponder={this._handleShouldStart}
+						onMoveShouldSetPanResponderCapture={this._handleShouldMoveCapture}
+						onMoveShouldSetPanResponder={this._handleShouldMove}
 						component={AnimatedDiv}
 						style={{
-							transform: anim.getTranslateTransform(),
+							transform: this.anim.getTranslateTransform(),
 						}}
 					>
 						<ReactLogo className="logo" />
 					</PanResponderView>
-					<div className="logger">
-						<ul>
-							{Object.keys(gestureState).map((prop) =>
-								<li key={prop}>{prop}: {gestureState[prop]}</li>
-							)}
-						</ul>
-					</div>
+					<Logger ref={(logger) => (this.logger = logger)} />
 				</div>
 
 				<div className="doc">
@@ -115,11 +171,25 @@ class App extends Component {
 									<td>Does this view want to become responder on the start of a touch?</td>
 								</tr>
 								<tr>
+									<td>onStartShouldSetPanResponderCapture</td>
+									<td>Function</td>
+									<td>{'() => false'}</td>
+									<td>false</td>
+									<td>Just like `onStartShouldSetPanResponder`, but use capture</td>
+								</tr>
+								<tr>
 									<td>onMoveShouldSetPanResponder</td>
 									<td>Function</td>
 									<td>{'() => true'}</td>
 									<td>false</td>
 									<td>Called for every touch move on the View when it is not the responder</td>
+								</tr>
+								<tr>
+									<td>onMoveShouldSetPanResponderCapture</td>
+									<td>Function</td>
+									<td>{'() => false'}</td>
+									<td>false</td>
+									<td>Just like `onMoveShouldSetPanResponder`, but use capture</td>
 								</tr>
 								<tr>
 									<td>onPanResponderGrant</td>
@@ -129,11 +199,25 @@ class App extends Component {
 									<td>The View is now responding for touch events. This is the time to highlight and show the user what is happening</td>
 								</tr>
 								<tr>
+									<td>onPanResponderStart</td>
+									<td>Function</td>
+									<td>{'(ev, gestureState) => {}'}</td>
+									<td>false</td>
+									<td>Called for every touch start when it is the responder</td>
+								</tr>
+								<tr>
 									<td>onPanResponderMove</td>
 									<td>Function</td>
 									<td>{'(ev, gestureState) => {}'}</td>
 									<td>false</td>
-									<td>The user is moving their finger</td>
+									<td>Called for every touch move when it is the responder</td>
+								</tr>
+								<tr>
+									<td>onPanResponderEnd</td>
+									<td>Function</td>
+									<td>{'(ev, gestureState) => {}'}</td>
+									<td>false</td>
+									<td>Called for every touch end when it is the responder</td>
 								</tr>
 								<tr>
 									<td>onPanResponderRelease</td>
