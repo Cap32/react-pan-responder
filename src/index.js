@@ -1,14 +1,17 @@
 
 import PropTypes from 'prop-types';
 import React, { Component } from 'react';
+import { findDOMNode } from 'react-dom';
 import { noop, returnsTrue } from 'empty-functions';
 import LockAxis from './LockAxis';
 import {
-	isFunction, supportCSSTouchActionPan, createEventOptions, passive,
-	TouchActions,
+	isFunction, supportCSSTouchActionPan, passive, TouchActions,
 } from './utils';
+import delegation from './delegation';
 
-let isTouchable;
+// TODO
+// let isTouchable;
+let isTouchable = true;
 
 const makeGetTouchInfo = (ev) => (key) =>
 	isTouchable ? ev.touches[0][key] : ev[key]
@@ -37,21 +40,22 @@ export default class PanResponderView extends Component {
 
 		onStartShouldSetPanResponder: PropTypes.func,
 		onMoveShouldSetPanResponder: PropTypes.func,
+		onPanResponderStart: PropTypes.func,
 		onPanResponderGrant: PropTypes.func,
 		onPanResponderMove: PropTypes.func,
+		onPanResponderEnd: PropTypes.func,
 		onPanResponderRelease: PropTypes.func,
 		onShouldStopPropagation: PropTypes.func,
-
-		onTouchStart: PropTypes.func, // react original event
-		onMouseDown: PropTypes.func, // react original event
 	};
 
 	static defaultProps = {
 		style: {},
 		component: 'div',
+		onPanResponderStart: noop,
 		onPanResponderGrant: noop,
 		onPanResponderMove: noop,
 		onPanResponderRelease: noop,
+		onPanResponderEnd: noop,
 		onStartShouldSetPanResponder: returnsTrue,
 		onMoveShouldSetPanResponder: returnsTrue,
 		onShouldStopPropagation: returnsTrue,
@@ -66,6 +70,21 @@ export default class PanResponderView extends Component {
 		this.state = {
 			style: this._setStyle(this.props),
 		};
+
+		delegation.init();
+	}
+
+	componentDidMount() {
+		delegation.addListener(findDOMNode(this), {
+			onShouldStart: this._handleShouldStart,
+			onGrant: this._handleGrant,
+			onStart: this._handleStart,
+			onBeforeMove: this._handleBeforeMove,
+			onShouldMove: this._handleShouldMove,
+			onMove: this._handleMove,
+			onRelease: this._handleRelease,
+			onEnd: this._handleEnd,
+		});
 	}
 
 	componentWillReceiveProps(nextProps) {
@@ -113,46 +132,26 @@ export default class PanResponderView extends Component {
 		}
 	};
 
-	_handleStart(ev) {
-		const {
-			onStartShouldSetPanResponder,
-			onPanResponderGrant,
-		} = this.props;
-
+	_handleShouldStart = (ev) => {
 		const getTouch = makeGetTouchInfo(ev);
 		this.gestureState = getDefaultGestureState({
 			x0: getTouch('pageX'),
 			y0: getTouch('pageY'),
 		});
 
-		if (!this._isResponder) {
-			this._isResponder = onStartShouldSetPanResponder(ev, this.gestureState);
-		}
+		return this.props.onStartShouldSetPanResponder(ev, this.gestureState);
+	};
 
-		if (!this._isResponder) { return; }
+	_handleGrant = (ev) => {
+		this.props.onPanResponderGrant(ev, this.gestureState);
+	};
 
-		this._lockingAxis = '';
+	_handleStart = (ev) => {
+		this.props.onPanResponderStart(ev, this.gestureState);
+	};
 
-		onPanResponderGrant(ev, this.gestureState);
-		this._handleShouldBlock(ev, this.gestureState);
-
-		const options = createEventOptions(this._capture);
-
-		window.addEventListener('touchmove', this._handleTouchMove, options);
-		window.addEventListener('mousemove', this._handleMouseMove, options);
-		window.addEventListener('touchend', this._handleTouchEnd, options);
-		window.addEventListener('mouseup', this._handleMouseUp, options);
-	}
-
-	_handleMove(ev) {
-		if (!this._isResponder) { return; }
-
-		const {
-			props: {
-				onPanResponderMove, onMoveShouldSetPanResponder, lockAxis,
-			},
-			gestureState,
-		} = this;
+	_handleBeforeMove = (ev) => {
+		const { gestureState } = this;
 
 		// TODO: should bind to `touch` client, not `event`.
 		const { timeStamp } = ev;
@@ -174,15 +173,25 @@ export default class PanResponderView extends Component {
 		gestureState.dy = nextDY;
 
 		this._mostRecentTimeStamp = timeStamp;
-		this._isResponder = onMoveShouldSetPanResponder(ev, gestureState);
+	};
+
+	_handleShouldMove = (ev) => {
+		return this.props.onMoveShouldSetPanResponder(ev, this.gestureState);
+	};
+
+	_handleMove = (ev) => {
+		const {
+			props: { onPanResponderMove, lockAxis },
+			gestureState,
+		} = this;
 
 		if (lockAxis === LockAxis.none) {
 			if (!passive) { ev.preventDefault(); }
 		}
 		else {
 			if (!this._lockingAxis) {
-				const absDX = Math.abs(nextDX);
-				const absDY = Math.abs(nextDY);
+				const absDX = Math.abs(gestureState.dx);
+				const absDY = Math.abs(gestureState.dy);
 				this._lockingAxis = absDX > absDY ? LockAxis.x : LockAxis.y;
 			}
 
@@ -195,68 +204,17 @@ export default class PanResponderView extends Component {
 			}
 		}
 
-		if (!this._isResponder) {
-			this._removeMoveListeners();
-			return;
-		}
-
 		onPanResponderMove(ev, gestureState);
-		this._handleShouldBlock(ev, gestureState);
-	}
+	};
 
-	_handleRelease(ev) {
-		this._removeMoveListeners();
+	_handleRelease = (ev) => {
+		this.props.onPanResponderRelease(ev, this.gestureState);
+	};
 
+	_handleEnd = (ev) => {
 		this._lockingAxis = '';
-
-		if (!this._isResponder) { return; }
-
-		const { onPanResponderRelease } = this.props;
-
-		this._isResponder = false;
-		onPanResponderRelease(ev, this.gestureState);
-		this.gestureState = {};
-	}
-
-	_handleTouchStart = (ev) => {
-		const { onTouchStart } = this.props;
-		isTouchable = true;
-		this._handleStart(ev);
-		onTouchStart && onTouchStart(ev);
+		this.props.onPanResponderEnd(ev, this.gestureState);
 	};
-
-	_handleMouseDown = (ev) => {
-		const { onMouseDown } = this.props;
-		isTouchable || this._handleStart(ev);
-		onMouseDown && onMouseDown(ev);
-	};
-
-	_handleTouchMove = (ev) => {
-		isTouchable = true;
-		this._handleMove(ev);
-	};
-
-	_handleMouseMove = (ev) => {
-		isTouchable || this._handleMove(ev);
-	};
-
-	_handleTouchEnd = (ev) => {
-		isTouchable = true;
-		this._handleRelease(ev);
-	};
-
-	_handleMouseUp = (ev) => {
-		isTouchable || this._handleRelease(ev);
-	};
-
-	_removeMoveListeners = () => {
-		const options = createEventOptions(this._capture);
-		window.removeEventListener('touchmove', this._handleTouchMove, options);
-		window.removeEventListener('mousemove', this._handleMouseMove, options);
-		window.removeEventListener('touchend', this._handleTouchEnd, options);
-		window.removeEventListener('mouseup', this._handleMouseUp, options);
-	};
-
 	render() {
 		const {
 			props: {
@@ -264,8 +222,10 @@ export default class PanResponderView extends Component {
 				lockAxis,
 
 				onPanResponderGrant,
+				onPanResponderStart,
 				onPanResponderMove,
 				onPanResponderRelease,
+				onPanResponderEnd,
 				onStartShouldSetPanResponder,
 				onMoveShouldSetPanResponder,
 				onShouldStopPropagation,
@@ -282,8 +242,6 @@ export default class PanResponderView extends Component {
 			<Comp
 				{...other}
 				{...state}
-				onTouchStart={this._handleTouchStart}
-				onMouseDown={this._handleMouseDown}
 				{...this._refs}
 			/>
 		);
