@@ -32,7 +32,11 @@
   "module": "es/index.js",
   "jsnext:main": "es/index.js",
   "author": "cap32",
-  "license": "MIT",
+  "license": "MIT",,
+  "peerDependencies": {
+    "react": "^15.0.0-0 || ^16.0.0-0",
+    "react-dom": "^15.0.0-0 || ^16.0.0-0"
+  },
   "dependencies": {
     "detect-passive-events": "^1.0.2",
     "empty-functions": "^1.0.2",

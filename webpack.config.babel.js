@@ -94,7 +94,8 @@ module.exports = (webpackEnv = {}) => {
 			libraryTarget: 'umd',
 		};
 		config.externals = {
-			react: 'React',
+			'react': 'React',
+			'react-dom': 'ReactDom',
 		};
 	}
 
