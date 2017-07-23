@@ -1,4 +1,6 @@
 
+// FIXME: doesn't work if browser supports css `touch-action`
+
 import { supportCSSTouchActionPan } from './utils';
 
 let locking = null;
