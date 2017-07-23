@@ -78,7 +78,9 @@ const makeGetTouchInfo = (ev) => (key) => {
 	return touch[key];
 };
 
-const getNumberActiveTouches = (ev) => ev.touches ? ev.touches.length : 1;
+const getNumberActiveTouches = (ev) =>
+	ev.touches ? ev.touches.length : (ev.type === 'mouseup' ? 0 : 1)
+;
 
 const handleStart = (ev) => {
 	const getTouch = makeGetTouchInfo(ev);
@@ -142,22 +144,24 @@ const handleMove = (ev) => {
 const handleEnd = (ev) => {
 	if (!gestureState.numberActiveTouches) { return; }
 
+	let handler;
+	const numberActiveTouches = getNumberActiveTouches(ev);
+
 	if (grantedNode && listeners.has(grantedNode)) {
-		const handler = listeners.get(grantedNode);
-		const numberActiveTouches = getNumberActiveTouches(ev);
+		handler = listeners.get(grantedNode);
 		gestureState.numberActiveTouches = numberActiveTouches;
 		handler.onEnd(ev, gestureState);
+	}
 
-		if (!numberActiveTouches) {
-			grantedNode = null;
-			handler.onRelease(ev, gestureState);
-			setTimeout(() => {
-				gestureState = {
-					...gestureState,
-					...getDefaultGestureState(),
-				};
-			}, 0);
-		}
+	if (!numberActiveTouches) {
+		grantedNode = null;
+		handler && handler.onRelease(ev, gestureState);
+		setTimeout(() => {
+			gestureState = {
+				...gestureState,
+				...getDefaultGestureState(),
+			};
+		}, 0);
 	}
 };
 
