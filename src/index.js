@@ -24,7 +24,6 @@ export default class PanResponderView extends Component {
 		onPanResponderMove: PropTypes.func,
 		onPanResponderEnd: PropTypes.func,
 		onPanResponderRelease: PropTypes.func,
-		onShouldStopPropagation: PropTypes.func,
 	};
 
 	static defaultProps = {
@@ -38,7 +37,6 @@ export default class PanResponderView extends Component {
 		onStartShouldSetPanResponder: returnsTrue,
 		onMoveShouldSetPanResponderCapture: returnsFalse,
 		onMoveShouldSetPanResponder: returnsTrue,
-		onShouldStopPropagation: returnsTrue,
 		lockAxis: AxisTypes.none,
 		withRef: false,
 	};
@@ -129,7 +127,6 @@ export default class PanResponderView extends Component {
 				onPanResponderMove,
 				onPanResponderRelease,
 				onPanResponderEnd,
-				onShouldStopPropagation,
 				withRef,
 
 				...other,

@@ -1,9 +1,10 @@
 
+import grantedTouchIds from './grantedTouchIds';
 import { createEventOptions, getElementPath } from './utils';
 
+let isTouch = false;
 let hasWindowListener = false;
 let grantedNode = null;
-let prevTouchId = null;
 
 let gestureState = {
 
@@ -53,29 +54,9 @@ const makeSetGrantedNode = (action) => (ev) => {
 const setGrantedNodeOnStart = makeSetGrantedNode('Start');
 const setGrantedNodeOnMove = makeSetGrantedNode('Move');
 
-const makeGetTouchInfo = (ev) => (key) => {
-	const { touches } = ev;
-	if (!touches) { return ev[key]; }
-
-	let touch;
-
-	if (prevTouchId) {
-		const { length } = touches;
-		for (let i = 0; i < length; i++) {
-			const current = touches[i];
-			if (current && current.identifier === prevTouchId) {
-				touch = current;
-				break;
-			}
-		}
-	}
-
-	if (!touch) {
-		touch = touches[0];
-		prevTouchId = touch.identifier;
-	}
-
-	return touch[key];
+const makeGetTouchInfo = (ev) => {
+	const touch = grantedTouchIds.getTouch(ev);
+	return (key) => touch[key];
 };
 
 const getNumberActiveTouches = (ev) =>
@@ -83,12 +64,19 @@ const getNumberActiveTouches = (ev) =>
 ;
 
 const handleStart = (ev) => {
+	isTouch = ev.type === 'touchstart';
+
 	const getTouch = makeGetTouchInfo(ev);
 	const numberActiveTouches = getNumberActiveTouches(ev);
 
 	if (grantedNode && listeners.has(grantedNode) && numberActiveTouches > 1) {
 		gestureState.numberActiveTouches = numberActiveTouches;
-		listeners.get(grantedNode).onStart(ev, gestureState);
+
+		const elementPath = getElementPath(ev);
+		if (elementPath.indexOf(grantedNode) > -1) {
+			grantedTouchIds.push(ev);
+			listeners.get(grantedNode).onStart(ev, gestureState);
+		}
 		return;
 	}
 
@@ -103,11 +91,13 @@ const handleStart = (ev) => {
 	grantedNode = setGrantedNodeOnStart(ev);
 
 	if (grantedNode) {
+		grantedTouchIds.push(ev);
 		listeners.get(grantedNode).onStart(ev, gestureState);
 	}
 };
 
 const handleMove = (ev) => {
+	if (isTouch && ev.type !== 'touchmove') { return; }
 	if (!gestureState.numberActiveTouches) { return; }
 
 	// ev.timeStamp is not accurate
@@ -134,26 +124,33 @@ const handleMove = (ev) => {
 
 	mostRecentTimeStamp = timeStamp;
 
-	grantedNode = setGrantedNodeOnMove(ev);
+	const hasGranted = !!grantedNode;
 
-	if (grantedNode) {
-		listeners.get(grantedNode).onMove(ev, gestureState);
+	if (!hasGranted) {
+		grantedNode = setGrantedNodeOnMove(ev);
+		if (grantedNode) { grantedTouchIds.push(ev); }
 	}
+
+	if (grantedNode) { listeners.get(grantedNode).onMove(ev, gestureState); }
 };
 
 const handleEnd = (ev) => {
+	if (isTouch && ev.type !== 'touchend') { return; }
 	if (!gestureState.numberActiveTouches) { return; }
 
 	let handler;
 	const numberActiveTouches = getNumberActiveTouches(ev);
 
 	if (grantedNode && listeners.has(grantedNode)) {
+		grantedTouchIds.pull(ev);
 		handler = listeners.get(grantedNode);
 		gestureState.numberActiveTouches = numberActiveTouches;
 		handler.onEnd(ev, gestureState);
 	}
 
-	if (!numberActiveTouches) {
+	if (!numberActiveTouches) { isTouch = false; }
+
+	if (!grantedTouchIds.getCount()) {
 		grantedNode = null;
 		handler && handler.onRelease(ev, gestureState);
 		setTimeout(() => {
