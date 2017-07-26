@@ -3,7 +3,7 @@ import PropTypes from 'prop-types';
 import React, { Component } from 'react';
 import { findDOMNode } from 'react-dom';
 import { noop, returnsTrue, returnsFalse } from 'empty-functions';
-import LockAxis, { AxisTypes } from './LockAxis';
+import AxisTypes from './AxisTypes';
 import delegation from './delegation';
 
 export default class PanResponderView extends Component {
@@ -43,6 +43,10 @@ export default class PanResponderView extends Component {
 
 	static AxisTypes = AxisTypes;
 
+	_locking = null;
+
+	_refs = this.props.withRef ? { ref: (c) => (this.ref = c) } : {};
+
 	componentWillMount() {
 		delegation.init();
 	}
@@ -65,8 +69,6 @@ export default class PanResponderView extends Component {
 		delegation.removeListener(findDOMNode(this));
 	}
 
-	_refs = this.props.withRef ? { ref: (c) => (this.ref = c) } : {};
-
 	getInstance() {
 		return this.ref;
 	}
@@ -81,7 +83,6 @@ export default class PanResponderView extends Component {
 
 	_handleGrant = (...args) => {
 		const { onPanResponderGrant, lockAxis } = this.props;
-		LockAxis.grant(findDOMNode(this), lockAxis);
 		onPanResponderGrant(...args);
 	};
 
@@ -99,7 +100,20 @@ export default class PanResponderView extends Component {
 
 	_handleMove = (ev, gestureState) => {
 		const { onPanResponderMove, lockAxis } = this.props;
-		LockAxis.move(findDOMNode(this), lockAxis, ev, gestureState);
+
+		if (lockAxis === AxisTypes.none) {
+			ev.preventDefault();
+		}
+		else {
+			if (!this._locking) {
+				const absDX = Math.abs(gestureState.dx);
+				const absDY = Math.abs(gestureState.dy);
+				this._locking = absDX > absDY ? AxisTypes.x : AxisTypes.y;
+			}
+
+			if (this._locking === lockAxis) { ev.preventDefault(); }
+		}
+
 		onPanResponderMove(ev, gestureState);
 	};
 
@@ -108,7 +122,7 @@ export default class PanResponderView extends Component {
 	};
 
 	_handleRelease = (...args) => {
-		LockAxis.release(findDOMNode(this));
+		this._locking = null;
 		this.props.onPanResponderRelease(...args);
 	};
 

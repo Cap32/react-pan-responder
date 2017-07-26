@@ -1,15 +1,13 @@
 
 import passiveEvents from 'detect-passive-events';
 
-export const supportCSSTouchActionPan = (function () {
-	try { return CSS.supports('touch-action', 'pan-x'); }
-	catch (err) { return false; }
-}());
+export const supportPassive = passiveEvents.hasSupport;
 
-export const passive = passiveEvents.hasSupport && supportCSSTouchActionPan;
-
-export function createEventOptions(capture = false) {
-	if (!passiveEvents.hasSupport) { return capture; }
+export function createEventOptions(
+	capture = false,
+	passive = false, // maybe, we should able to use `passive = true` sometimes
+) {
+	if (!supportPassive) { return capture; }
 	return { capture, passive };
 }
 
