@@ -1,6 +1,7 @@
 
 import grantedTouchIds from './grantedTouchIds';
 import { createEventOptions, getElementPath } from './utils';
+import WeakMap from './WeakMapPolyfill';
 
 let isTouch = false;
 let hasWindowListener = false;
@@ -24,7 +25,6 @@ const getDefaultGestureState = () => ({
 	numberActiveTouches: 0,
 });
 
-// TODO: should add a polyfill
 const listeners = new WeakMap();
 
 let mostRecentTimeStamp = 0;
