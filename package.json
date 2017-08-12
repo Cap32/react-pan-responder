@@ -39,7 +39,6 @@
   },
   "dependencies": {
     "detect-passive-events": "^1.0.2",
-    "empty-functions": "^1.0.2",
     "prop-types": "^15.5.7"
   },
   "devDependencies": {

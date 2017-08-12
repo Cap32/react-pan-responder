@@ -1,6 +1,12 @@
 
 import passiveEvents from 'detect-passive-events';
 
+export function isFunction(target) {
+	return typeof target === 'function';
+}
+
+export function noop() {}
+
 export const supportPassive = passiveEvents.hasSupport;
 
 export function createEventOptions(

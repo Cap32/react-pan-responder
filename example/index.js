@@ -165,29 +165,29 @@ class App extends Component {
 								</tr>
 								<tr>
 									<td>onStartShouldSetPanResponder</td>
-									<td>Function</td>
-									<td>{'() => true'}</td>
+									<td>Function | Boolean</td>
+									<td>false</td>
 									<td>false</td>
 									<td>Does this view want to become responder on the start of a touch?</td>
 								</tr>
 								<tr>
 									<td>onStartShouldSetPanResponderCapture</td>
-									<td>Function</td>
-									<td>{'() => false'}</td>
+									<td>Function | Boolean</td>
+									<td>false</td>
 									<td>false</td>
 									<td>Just like `onStartShouldSetPanResponder`, but use capture</td>
 								</tr>
 								<tr>
 									<td>onMoveShouldSetPanResponder</td>
-									<td>Function</td>
-									<td>{'() => true'}</td>
+									<td>Function | Boolean</td>
+									<td>false</td>
 									<td>false</td>
 									<td>Called for every touch move on the View when it is not the responder</td>
 								</tr>
 								<tr>
 									<td>onMoveShouldSetPanResponderCapture</td>
-									<td>Function</td>
-									<td>{'() => false'}</td>
+									<td>Function | Boolean</td>
+									<td>false</td>
 									<td>false</td>
 									<td>Just like `onMoveShouldSetPanResponder`, but use capture</td>
 								</tr>

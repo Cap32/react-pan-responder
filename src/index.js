@@ -2,9 +2,14 @@
 import PropTypes from 'prop-types';
 import React, { Component } from 'react';
 import { findDOMNode } from 'react-dom';
-import { noop, returnsTrue, returnsFalse } from 'empty-functions';
 import AxisTypes from './AxisTypes';
 import delegation from './delegation';
+import { isFunction, noop } from './utils';
+
+const funcOrBool = PropTypes.oneOfType([
+	PropTypes.func,
+	PropTypes.bool,
+]);
 
 export default class PanResponderView extends Component {
 	static propTypes = {
@@ -15,10 +20,10 @@ export default class PanResponderView extends Component {
 		lockAxis: PropTypes.oneOf(Object.keys(AxisTypes)),
 		withRef: PropTypes.bool,
 
-		onStartShouldSetPanResponderCapture: PropTypes.func,
-		onStartShouldSetPanResponder: PropTypes.func,
-		onMoveShouldSetPanResponderCapture: PropTypes.func,
-		onMoveShouldSetPanResponder: PropTypes.func,
+		onStartShouldSetPanResponderCapture: funcOrBool,
+		onStartShouldSetPanResponder: funcOrBool,
+		onMoveShouldSetPanResponderCapture: funcOrBool,
+		onMoveShouldSetPanResponder: funcOrBool,
 		onPanResponderStart: PropTypes.func,
 		onPanResponderGrant: PropTypes.func,
 		onPanResponderMove: PropTypes.func,
@@ -33,10 +38,10 @@ export default class PanResponderView extends Component {
 		onPanResponderMove: noop,
 		onPanResponderRelease: noop,
 		onPanResponderEnd: noop,
-		onStartShouldSetPanResponderCapture: returnsFalse,
-		onStartShouldSetPanResponder: returnsTrue,
-		onMoveShouldSetPanResponderCapture: returnsFalse,
-		onMoveShouldSetPanResponder: returnsTrue,
+		onStartShouldSetPanResponderCapture: false,
+		onStartShouldSetPanResponder: false,
+		onMoveShouldSetPanResponderCapture: false,
+		onMoveShouldSetPanResponder: false,
 		lockAxis: AxisTypes.none,
 		withRef: false,
 	};
@@ -74,11 +79,13 @@ export default class PanResponderView extends Component {
 	}
 
 	_handleShouldStartCapture = (...args) => {
-		return this.props.onStartShouldSetPanResponderCapture(...args);
+		const { onStartShouldSetPanResponderCapture: should } = this.props;
+		return isFunction(should) ? should(...args) : should;
 	};
 
 	_handleShouldStart = (...args) => {
-		return this.props.onStartShouldSetPanResponder(...args);
+		const { onStartShouldSetPanResponder: should } = this.props;
+		return isFunction(should) ? should(...args) : should;
 	};
 
 	_handleGrant = (...args) => {
@@ -91,11 +98,13 @@ export default class PanResponderView extends Component {
 	};
 
 	_handleShouldMoveCapture = (...args) => {
-		return this.props.onMoveShouldSetPanResponderCapture(...args);
+		const { onMoveShouldSetPanResponderCapture: should } = this.props;
+		return isFunction(should) ? should(...args) : should;
 	};
 
 	_handleShouldMove = (...args) => {
-		return this.props.onMoveShouldSetPanResponder(...args);
+		const { onMoveShouldSetPanResponder: should } = this.props;
+		return isFunction(should) ? should(...args) : should;
 	};
 
 	_handleMove = (ev, gestureState) => {
