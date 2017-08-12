@@ -1,5 +1,6 @@
 
 import delay from 'delay';
+import { getElementPath } from '../src/utils';
 
 export default class Simulator {
 	static create(domNode) {
@@ -51,9 +52,11 @@ export default class Simulator {
 			event.touches = touches;
 			event.changedTouches = touches;
 		}
-		event.path = [window, this._domNode].filter(
-			(d, index, arr) => arr.indexOf(d) === index
-		);
+		event.path = [
+			...getElementPath({ target: this._domNode }),
+			window,
+		].filter((d, index, arr) => arr.indexOf(d) === index);
+
 		window.dispatchEvent(event);
 	}
 

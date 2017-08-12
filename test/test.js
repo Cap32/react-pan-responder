@@ -1,5 +1,6 @@
 
 import React from 'react';
+import { findDOMNode } from 'react-dom';
 import { JSDOM } from 'jsdom';
 import { mount } from 'enzyme';
 import Simulator from './Simulator';
@@ -63,7 +64,7 @@ describe('onStartShouldSetPanResponder', function () {
 		expect(handler.mock.calls.length).toBe(1);
 	});
 
-	test('should grant if `onStartShouldSetPanResponder` function returns true', async () => {
+	test('should grant if `onStartShouldSetPanResponder()` function returns true', async () => {
 		const handler = jest.fn();
 		const shouldSetPanResponder = (ev, gestureState) => gestureState.x0 > 100;
 		wrapper = mount(
@@ -83,6 +84,132 @@ describe('onStartShouldSetPanResponder', function () {
 		;
 		expect(handler.mock.calls.length).toBe(2);
 	});
+
+	test('should `onStartShouldSetPanResponder()` `gestureState` work', async () => {
+		const handler = jest.fn();
+		const touchClient = { pageX: 100, pageY: 200 };
+		wrapper = mount(
+			<PanView
+				onStartShouldSetPanResponder={handler}
+			/>
+		);
+		await Simulator
+			.create(wrapper.find(PanView).getDOMNode())
+			.touchStart(touchClient)
+			.touchEnd()
+			.exec()
+		;
+		const [, gestureState] = handler.mock.calls[0];
+		expect(gestureState.dx).toEqual(0);
+		expect(gestureState.dy).toEqual(0);
+		expect(gestureState.moveX).toEqual(0);
+		expect(gestureState.moveY).toEqual(0);
+		expect(gestureState.numberActiveTouches).toEqual(1);
+		expect(gestureState.vx).toEqual(0);
+		expect(gestureState.vy).toEqual(0);
+		expect(gestureState.x0).toEqual(touchClient.pageX);
+		expect(gestureState.y0).toEqual(touchClient.pageY);
+	});
+});
+
+describe('onStartShouldSetPanResponderCapture', function () {
+	test('should grant if `onStartShouldSetPanResponderCapture()` function returns true', async () => {
+		const handler = jest.fn();
+		const shouldSetPanResponder = (ev, gestureState) => gestureState.x0 > 100;
+		wrapper = mount(
+			<PanView
+				onStartShouldSetPanResponderCapture={shouldSetPanResponder}
+				onPanResponderGrant={handler}
+			/>
+		);
+		await Simulator
+			.create(wrapper.find(PanView).getDOMNode())
+			.touchStart({ pageX: 102 })
+			.touchEnd()
+			.touchStart({ pageX: 101 })
+			.touchEnd()
+			.touchStart({ pageX: 100 })
+			.exec()
+		;
+		expect(handler.mock.calls.length).toBe(2);
+	});
+
+	test('should `onStartShouldSetPanResponderCapture()` `gestureState` work', async () => {
+		const handler = jest.fn();
+		const touchClient = { pageX: 100, pageY: 200 };
+		wrapper = mount(
+			<PanView
+				onStartShouldSetPanResponderCapture={handler}
+			/>
+		);
+		await Simulator
+			.create(wrapper.find(PanView).getDOMNode())
+			.touchStart(touchClient)
+			.touchEnd()
+			.exec()
+		;
+		const [, gestureState] = handler.mock.calls[0];
+		expect(gestureState.dx).toEqual(0);
+		expect(gestureState.dy).toEqual(0);
+		expect(gestureState.moveX).toEqual(0);
+		expect(gestureState.moveY).toEqual(0);
+		expect(gestureState.numberActiveTouches).toEqual(1);
+		expect(gestureState.vx).toEqual(0);
+		expect(gestureState.vy).toEqual(0);
+		expect(gestureState.x0).toEqual(touchClient.pageX);
+		expect(gestureState.y0).toEqual(touchClient.pageY);
+	});
+
+	test('should fire `onStartShouldSetPanResponderCapture()` before fire `onStartShouldSetPanResponder()`', async () => {
+		const handler = jest.fn();
+		wrapper = mount(
+			<PanView
+				onStartShouldSetPanResponderCapture={() => handler(2)}
+				onStartShouldSetPanResponder={() => handler(3)}
+			>
+				<PanView
+					onStartShouldSetPanResponderCapture={() => handler(1)}
+					onStartShouldSetPanResponder={() => handler(4)}
+				/>
+			</PanView>
+		);
+		await Simulator
+			.create(findDOMNode(wrapper.find(PanView).get(1)))
+			.touchStart()
+			.touchEnd()
+			.exec()
+		;
+		const { calls } = handler.mock;
+		expect(calls[0][0]).toBe(1);
+		expect(calls[1][0]).toBe(2);
+		expect(calls[2][0]).toBe(3);
+		expect(calls[3][0]).toBe(4);
+	});
+
+	test('should not fire parent `onStartShouldSetPanResponderCapture()` if child node returns true', async () => {
+		const handler = jest.fn();
+		wrapper = mount(
+			<PanView
+				onStartShouldSetPanResponderCapture={() => handler(2)}
+				onStartShouldSetPanResponder={() => handler(3)}
+			>
+				<PanView
+					onStartShouldSetPanResponderCapture={() => handler(1) || true}
+					onStartShouldSetPanResponder={() => handler(4)}
+				/>
+			</PanView>
+		);
+		await Simulator
+			.create(findDOMNode(wrapper.find(PanView).get(1)))
+			.touchStart()
+			.touchEnd()
+			.exec()
+		;
+		const { calls } = handler.mock;
+		expect(calls[0][0]).toBe(1);
+		expect(calls.length).toBe(1);
+	});
+
 });
 
 describe('onMoveShouldSetPanResponder', function () {
@@ -142,6 +269,33 @@ describe('onMoveShouldSetPanResponder', function () {
 		;
 		expect(handler.mock.calls.length).toBe(2);
 	});
+
+	test('should `onMoveShouldSetPanResponder()` `gestureState` work', async () => {
+		const handler = jest.fn();
+		const touchClient = { pageX: 100, pageY: 200 };
+		wrapper = mount(
+			<PanView
+				onMoveShouldSetPanResponder={handler}
+			/>
+		);
+		await Simulator
+			.create(wrapper.find(PanView).getDOMNode())
+			.touchStart(touchClient)
+			.touchMove(touchClient)
+			.touchEnd()
+			.exec()
+		;
+		const [, gestureState] = handler.mock.calls[0];
+		expect(gestureState.dx).toEqual(0);
+		expect(gestureState.dy).toEqual(0);
+		expect(gestureState.moveX).toEqual(100);
+		expect(gestureState.moveY).toEqual(200);
+		expect(gestureState.numberActiveTouches).toEqual(1);
+		expect(gestureState.vx).toEqual(0);
+		expect(gestureState.vy).toEqual(0);
+		expect(gestureState.x0).toEqual(touchClient.pageX);
+		expect(gestureState.y0).toEqual(touchClient.pageY);
+	});
 });
 
 describe('onPanResponderGrant', function () {
@@ -196,9 +350,15 @@ describe('onPanResponderGrant', function () {
 		;
 
 		const [, gestureState] = handler.mock.calls[0];
+		expect(gestureState.dx).toEqual(0);
+		expect(gestureState.dy).toEqual(0);
+		expect(gestureState.moveX).toEqual(0);
+		expect(gestureState.moveY).toEqual(0);
+		expect(gestureState.numberActiveTouches).toEqual(1);
+		expect(gestureState.vx).toEqual(0);
+		expect(gestureState.vy).toEqual(0);
 		expect(gestureState.x0).toEqual(touchClient.pageX);
 		expect(gestureState.y0).toEqual(touchClient.pageY);
-		expect(gestureState.numberActiveTouches).toEqual(1);
 	});
 });
 
@@ -253,6 +413,13 @@ describe('onPanResponderStart', function () {
 			.exec()
 		;
 		const [, gestureState] = handler.mock.calls[0];
+		expect(gestureState.dx).toEqual(0);
+		expect(gestureState.dy).toEqual(0);
+		expect(gestureState.moveX).toEqual(0);
+		expect(gestureState.moveY).toEqual(0);
+		expect(gestureState.numberActiveTouches).toEqual(1);
+		expect(gestureState.vx).toEqual(0);
+		expect(gestureState.vy).toEqual(0);
 		expect(gestureState.x0).toEqual(touchClient.pageX);
 		expect(gestureState.y0).toEqual(touchClient.pageY);
 	});
@@ -312,6 +479,13 @@ describe('onPanResponderMove', function () {
 			.exec()
 		;
 		const [, gestureState] = handler.mock.calls[0];
+		expect(gestureState.dx).toEqual(0);
+		expect(gestureState.dy).toEqual(0);
+		expect(gestureState.moveX).toEqual(100);
+		expect(gestureState.moveY).toEqual(200);
+		expect(gestureState.numberActiveTouches).toEqual(1);
+		expect(gestureState.vx).toEqual(0);
+		expect(gestureState.vy).toEqual(0);
 		expect(gestureState.x0).toEqual(touchClient.pageX);
 		expect(gestureState.y0).toEqual(touchClient.pageY);
 	});
