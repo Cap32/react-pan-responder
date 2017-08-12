@@ -3,6 +3,8 @@ import grantedTouchIds from './grantedTouchIds';
 import { createEventOptions, getElementPath } from './utils';
 import WeakMap from './WeakMapPolyfill';
 
+const eventOptions = createEventOptions(true);
+
 let isTouch = false;
 let hasWindowListener = false;
 let grantedNode = null;
@@ -65,6 +67,11 @@ const getNumberActiveTouches = (ev) =>
 
 const handleStart = (ev) => {
 	isTouch = ev.type === 'touchstart';
+
+	if (!isTouch) {
+		window.addEventListener('mousemove', handleMove, eventOptions);
+		window.addEventListener('mouseup', handleEnd, eventOptions);
+	}
 
 	const getTouch = makeGetTouchInfo(ev);
 	const numberActiveTouches = getNumberActiveTouches(ev);
@@ -135,6 +142,11 @@ const handleMove = (ev) => {
 };
 
 const handleEnd = (ev) => {
+	if (!isTouch) {
+		window.removeEventListener('mousemove', handleMove, eventOptions);
+		window.removeEventListener('mouseup', handleEnd, eventOptions);
+	}
+
 	if (isTouch && ev.type !== 'touchend') { return; }
 	if (!gestureState.numberActiveTouches) { return; }
 
@@ -166,13 +178,11 @@ const ensureWindowListener = () => {
 	if (hasWindowListener) { return; }
 
 	hasWindowListener = true;
-	const eventOptions = createEventOptions(true);
 	window.addEventListener('mousedown', handleStart, eventOptions);
-	window.addEventListener('mousemove', handleMove, eventOptions);
-	window.addEventListener('mouseup', handleEnd, eventOptions);
 	window.addEventListener('touchstart', handleStart, eventOptions);
 	window.addEventListener('touchmove', handleMove, eventOptions);
 	window.addEventListener('touchend', handleEnd, eventOptions);
+	window.addEventListener('touchcancel', handleEnd, eventOptions);
 };
 
 export default {
