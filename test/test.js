@@ -1,27 +1,27 @@
 
 import React from 'react';
-import jsdom from 'jsdom';
+import { JSDOM } from 'jsdom';
 import { mount } from 'enzyme';
-import { simulateTouchEvent, simulateMouseEvent } from './utils';
+import Simulator from './Simulator';
 import PanView from '../src';
+import delegation from '../src/delegation';
 
 let wrapper;
 
 beforeEach(() => {
-	global.document = jsdom.jsdom(
+	const { window } = new JSDOM(
 		'<!doctype html><html><body></body></html>'
 	);
-	if (typeof window === 'undefined') {
-		global.window = global.document.defaultView;
-		global.navigator = global.window.navigator;
-	}
+	global.window = window;
+	global.document = window.document;
 });
 
 afterEach(() => {
+	delegation.destroy();
 	if (wrapper.unmount) { wrapper.unmount(); }
 });
 
-describe('<PanView />', function () {
+describe('PanView component', function () {
 	test('should be a div', function () {
 		const text = 'hello world';
 		wrapper = mount(
@@ -32,57 +32,131 @@ describe('<PanView />', function () {
 });
 
 describe('onPanResponderGrant', function () {
-	test('should trigger on touch start', function (done) {
+	test('should grant on touch start', async (done) => {
 		wrapper = mount(
 			<PanView onPanResponderGrant={done} />
 		);
-		wrapper.find(PanView).simulate('touchstart', { touches: [{}] });
+		await Simulator
+			.create(wrapper.find(PanView).getDOMNode())
+			.touchStart()
+			.exec()
+		;
 	});
 
-	test('should trigger on mouse down', function (done) {
+	test('should grant on mouse down', async (done) => {
 		wrapper = mount(
 			<PanView onPanResponderGrant={done} />
 		);
-		wrapper.find(PanView).simulate('mousedown');
+		await Simulator
+			.create(wrapper.find(PanView).getDOMNode())
+			.mouseDown()
+			.exec()
+		;
 	});
 
-	test('should arguments work', function (done) {
+	test('should grant gestureState work', async (done) => {
 		const touchClient = { pageX: 100, pageY: 200 };
 		const handlePanResponderGrant = (ev, gestureState) => {
 			expect(ev.touches[0]).toEqual(touchClient);
-			expect(gestureState).toEqual({
-				x0: touchClient.pageX,
-				y0: touchClient.pageY,
-				moveX: 0,
-				moveY: 0,
-				dx: 0,
-				dy: 0,
-			});
+			expect(gestureState.x0).toEqual(touchClient.pageX);
+			expect(gestureState.y0).toEqual(touchClient.pageY);
+			expect(gestureState.numberActiveTouches).toEqual(1);
 			done();
 		};
 		wrapper = mount(
 			<PanView onPanResponderGrant={handlePanResponderGrant} />
 		);
-		wrapper.find(PanView).simulate('touchstart', {
-			touches: [touchClient],
-		});
+		await Simulator
+			.create(wrapper.find(PanView).getDOMNode())
+			.touchStart(touchClient)
+			.exec()
+		;
+	});
+});
+
+describe('onPanResponderStart', function () {
+	test('should start on touch start', async (done) => {
+		wrapper = mount(
+			<PanView onPanResponderStart={done} />
+		);
+		await Simulator
+			.create(wrapper.find(PanView).getDOMNode())
+			.touchStart()
+			.exec()
+		;
+	});
+
+	test('should start on mouse down', async (done) => {
+		wrapper = mount(
+			<PanView onPanResponderStart={done} />
+		);
+		await Simulator
+			.create(wrapper.find(PanView).getDOMNode())
+			.mouseDown()
+			.exec()
+		;
+	});
+
+	test('should start gestureState work', async (done) => {
+		const touchClient = { pageX: 100, pageY: 200 };
+		const handler = (ev, gestureState) => {
+			expect(gestureState.x0).toEqual(touchClient.pageX);
+			expect(gestureState.y0).toEqual(touchClient.pageY);
+			expect(gestureState.numberActiveTouches).toEqual(1);
+			done();
+		};
+		wrapper = mount(
+			<PanView onPanResponderStart={handler} />
+		);
+		await Simulator
+			.create(wrapper.find(PanView).getDOMNode())
+			.touchStart(touchClient)
+			.exec()
+		;
 	});
 });
 
 describe('onPanResponderMove', function () {
-	test('should trigger on touch move', function (done) {
+	test('should move on touch move', async (done) => {
 		wrapper = mount(
 			<PanView onPanResponderMove={done} />
 		);
-		wrapper.find(PanView).simulate('touchstart', { touches: [{}] });
-		simulateTouchEvent('touchmove', { pageX: 100, pageY: 200 });
+		await Simulator
+			.create(wrapper.find(PanView).getDOMNode())
+			.touchStart()
+			.touchMove()
+			.exec()
+		;
 	});
 
-	test('should trigger on mouse move', function (done) {
+	test('should move on mouse move', async (done) => {
 		wrapper = mount(
 			<PanView onPanResponderMove={done} />
 		);
-		wrapper.find(PanView).simulate('mousedown');
-		simulateMouseEvent('mousemove', { pageX: 100, pageY: 200 });
+		await Simulator
+			.create(wrapper.find(PanView).getDOMNode())
+			.mouseDown()
+			.mouseMove()
+			.exec()
+		;
+	});
+
+	test('should start gestureState work', async (done) => {
+		const touchClient = { pageX: 100, pageY: 200 };
+		const handler = (ev, gestureState) => {
+			expect(gestureState.x0).toEqual(touchClient.pageX);
+			expect(gestureState.y0).toEqual(touchClient.pageY);
+			expect(gestureState.numberActiveTouches).toEqual(1);
+			done();
+		};
+		wrapper = mount(
+			<PanView onPanResponderMove={handler} />
+		);
+		await Simulator
+			.create(wrapper.find(PanView).getDOMNode())
+			.touchStart(touchClient)
+			.touchMove(touchClient)
+			.exec()
+		;
 	});
 });

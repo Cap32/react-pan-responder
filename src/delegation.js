@@ -77,9 +77,11 @@ const handleStart = (ev) => {
 	const numberActiveTouches = getNumberActiveTouches(ev);
 
 	if (grantedNode && listeners.has(grantedNode) && numberActiveTouches > 1) {
+
 		gestureState.numberActiveTouches = numberActiveTouches;
 
 		const elementPath = getElementPath(ev);
+
 		if (elementPath.indexOf(grantedNode) > -1) {
 			grantedTouchIds.push(ev);
 			listeners.get(grantedNode).onStart(ev, gestureState);
@@ -175,8 +177,6 @@ const handleEnd = (ev) => {
 };
 
 const ensureWindowListener = () => {
-	if (hasWindowListener) { return; }
-
 	hasWindowListener = true;
 	window.addEventListener('mousedown', handleStart, eventOptions);
 	window.addEventListener('touchstart', handleStart, eventOptions);
@@ -187,7 +187,7 @@ const ensureWindowListener = () => {
 
 export default {
 	init() {
-		ensureWindowListener();
+		if (!hasWindowListener) { ensureWindowListener(); }
 	},
 
 	addListener(domNode, handlers) {
@@ -203,5 +203,21 @@ export default {
 
 	removeListener(domNode) {
 		listeners.delete(domNode);
+	},
+
+	// Useful for testing
+	destroy() {
+		hasWindowListener = false;
+		isTouch = false;
+		grantedNode = null;
+		gestureState = { stateID: Math.random() };
+
+		window.removeEventListener('mousedown', handleStart, eventOptions);
+		window.removeEventListener('mousemove', handleMove, eventOptions);
+		window.removeEventListener('mouseup', handleEnd, eventOptions);
+		window.removeEventListener('touchstart', handleStart, eventOptions);
+		window.removeEventListener('touchmove', handleMove, eventOptions);
+		window.removeEventListener('touchend', handleEnd, eventOptions);
+		window.removeEventListener('touchcancel', handleEnd, eventOptions);
 	},
 };

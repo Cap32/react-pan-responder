@@ -82,7 +82,7 @@ export default class PanResponderView extends Component {
 	};
 
 	_handleGrant = (...args) => {
-		const { onPanResponderGrant, lockAxis } = this.props;
+		const { onPanResponderGrant } = this.props;
 		onPanResponderGrant(...args);
 	};
 
