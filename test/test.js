@@ -334,7 +334,7 @@ describe('onPanResponderGrant', function () {
 		expect(handler.mock.calls.length).toBe(1);
 	});
 
-	test('should grant gestureState work', async () => {
+	test('should grant `gestureState` work', async () => {
 		const handler = jest.fn();
 		const touchClient = { pageX: 100, pageY: 200 };
 		wrapper = mount(
@@ -367,6 +367,7 @@ describe('onPanResponderGrant', function () {
 		wrapper = mount(
 			<PanView
 				onStartShouldSetPanResponder
+				onMoveShouldSetPanResponder
 				onPanResponderGrant={handler}
 			/>
 		);
@@ -374,6 +375,9 @@ describe('onPanResponderGrant', function () {
 			.create(wrapper.find(PanView).getDOMNode())
 			.touchStart({}, 1)
 			.touchStart({}, 2)
+			.touchMove({}, 1)
+			.touchMove({}, 1)
+			.touchMove({}, 2)
 			.touchEnd({}, 1)
 			.touchEnd({}, 2)
 			.exec()
@@ -417,7 +421,7 @@ describe('onPanResponderStart', function () {
 		expect(handler.mock.calls.length).toBe(1);
 	});
 
-	test('should start gestureState work', async () => {
+	test('should start `gestureState` work', async () => {
 		const handler = jest.fn();
 		const touchClient = { pageX: 100, pageY: 200 };
 		wrapper = mount(
@@ -482,7 +486,7 @@ describe('onPanResponderMove', function () {
 		expect(handler.mock.calls.length).toBe(1);
 	});
 
-	test('should start gestureState work', async () => {
+	test('should start `gestureState` work', async () => {
 		const handler = jest.fn();
 		const touchClient = { pageX: 100, pageY: 200 };
 		wrapper = mount(
