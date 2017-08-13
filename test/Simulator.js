@@ -9,24 +9,60 @@ export default class Simulator {
 
 	constructor(domNode) {
 		this._actions = [];
+		this._touches = [];
+		this._changedTouches = [];
 		this._domNode = domNode;
 	}
 
-	_perform(eventType, touches) {
-		const event = document.createEvent('MouseEvents');
-		touches = [].concat(touches);
-		const {
-			screenX = 0,
-			screenY = 0,
-			clientX = 0,
-			clientY = 0,
-			pageX = 0,
-			pageY = 0,
-		} = touches[0] || {};
+	get _prevTouchIdentifier() {
+		return (this._touches[0] || {}).identifier || 0;
+	}
 
-		if (!touches.length) {
-			touches.push({ screenX, screenY, clientX, clientY, pageX, pageY });
+	_createTouch(data, identifier) {
+		return {
+			...this._ensureData(data),
+			identifier,
+		};
+	}
+
+	_ensureData(data) {
+		return {
+			screenX: 0,
+			screenY: 0,
+			clientX: 0,
+			clientY: 0,
+			pageX: 0,
+			pageY: 0,
+			...data,
+		};
+	}
+
+	_pushTouch(touch) {
+		const index = this._touches.findIndex(
+			(t) => t.identifier === touch.identifier
+		);
+
+		if (index > -1) {
+			this._touches.splice(index, 1, touch);
 		}
+		else {
+			this._touches.push(touch);
+		}
+		this._changedTouches = [touch];
+	}
+
+	_dropTouch(touch) {
+		const index = this._touches.findIndex(
+			(t) => t.identifier === touch.identifier
+		);
+		if (index > -1) {
+			this._touches.splice(index, 1);
+		}
+		this._changedTouches = [];
+	}
+
+	_perform(eventType, data) {
+		const event = document.createEvent('MouseEvents');
 
 		event.initMouseEvent(
 			eventType,								// type
@@ -34,12 +70,12 @@ export default class Simulator {
 			true,											// cancelable
 			window,										// view
 			1,												// detail
-			screenX || 0,							// screenX
-			screenY || 0,							// screenY
-			clientX || 0,							// clientX
-			clientY || 0,							// clientY
-			pageX || 0,								// pageX
-			pageY || 0,								// pageY
+			data.screenX,						// screenX
+			data.screenY,						// screenY
+			data.clientX,						// clientX
+			data.clientY,						// clientY
+			data.pageX,							// pageX
+			data.pageY,							// pageY
 			false,										// ctrlKey
 			false,										// altKey
 			false,										// shiftKey
@@ -49,8 +85,8 @@ export default class Simulator {
 		);
 
 		if (eventType.startsWith('touch')) {
-			event.touches = touches;
-			event.changedTouches = touches;
+			event.touches = this._touches;
+			event.changedTouches = this._changedTouches;
 		}
 		event.path = [
 			...getElementPath({ target: this._domNode }),
@@ -60,33 +96,54 @@ export default class Simulator {
 		window.dispatchEvent(event);
 	}
 
-	_push(eventType, touches = []) {
-		this._actions.push(() => this._perform(eventType, touches));
+	_push(action) {
+		this._actions.push(action);
 		return this;
 	}
 
-	mouseDown(touches) {
-		return this._push('mousedown', touches);
+	_pushMouseAction(eventType, data) {
+		return this._push(() =>
+			this._perform(eventType, this._ensureData(data)),
+		);
 	}
 
-	mouseMove(touches) {
-		return this._push('mousemove', touches);
+	mouseDown(data) {
+		return this._pushMouseAction('mousedown', data);
 	}
 
-	mouseUp(touches) {
-		return this._push('mouseup', touches);
+	mouseMove(data) {
+		return this._pushMouseAction('mousemove', data);
 	}
 
-	touchStart(touches) {
-		return this._push('touchstart', touches);
+	mouseUp(data) {
+		return this._pushMouseAction('mouseup', data);
 	}
 
-	touchMove(touches) {
-		return this._push('touchmove', touches);
+	touchStart(data, identifier) {
+		return this._push(() => {
+			const touch = this._createTouch(data, identifier || Math.random());
+			this._pushTouch(touch);
+			this._perform('touchstart', touch);
+		});
 	}
 
-	touchEnd(touches) {
-		return this._push('touchend', touches);
+	touchMove(data, identifier) {
+		return this._push(() => {
+			const touchId = identifier || this._prevTouchIdentifier;
+			const touch = this._createTouch(data, touchId);
+			this._pushTouch(touch);
+			this._perform('touchmove', touch);
+		});
+	}
+
+	touchEnd(data, identifier) {
+		return this._push(() => {
+			const touchId = identifier || this._prevTouchIdentifier;
+			const touch = this._createTouch(data, touchId);
+			this._pushTouch(touch);
+			this._perform('touchend', touch);
+			this._dropTouch(touch);
+		});
 	}
 
 	async exec() {

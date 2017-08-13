@@ -80,6 +80,7 @@ describe('onStartShouldSetPanResponder', function () {
 			.touchStart({ pageX: 101 })
 			.touchEnd()
 			.touchStart({ pageX: 100 })
+			.touchEnd()
 			.exec()
 		;
 		expect(handler.mock.calls.length).toBe(2);
@@ -359,6 +360,25 @@ describe('onPanResponderGrant', function () {
 		expect(gestureState.vy).toEqual(0);
 		expect(gestureState.x0).toEqual(touchClient.pageX);
 		expect(gestureState.y0).toEqual(touchClient.pageY);
+	});
+
+	test('should grant once', async () => {
+		const handler = jest.fn();
+		wrapper = mount(
+			<PanView
+				onStartShouldSetPanResponder
+				onPanResponderGrant={handler}
+			/>
+		);
+		await Simulator
+			.create(wrapper.find(PanView).getDOMNode())
+			.touchStart({}, 1)
+			.touchStart({}, 2)
+			.touchEnd({}, 1)
+			.touchEnd({}, 2)
+			.exec()
+		;
+		expect(handler.mock.calls.length).toBe(1);
 	});
 });
 

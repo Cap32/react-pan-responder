@@ -77,7 +77,6 @@ const handleStart = (ev) => {
 	const numberActiveTouches = getNumberActiveTouches(ev);
 
 	if (grantedNode && listeners.has(grantedNode) && numberActiveTouches > 1) {
-
 		gestureState.numberActiveTouches = numberActiveTouches;
 
 		const elementPath = getElementPath(ev);
