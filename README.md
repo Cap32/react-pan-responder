@@ -89,10 +89,11 @@ A view can become the touch responder by implementing the correct negotiation me
 
 * `View.props.onStartShouldSetResponder: (event, gestureState) => true`, - Does this view want to become responder on the start of a touch?
 * `View.props.onMoveShouldSetResponder: (event, gestureState) => true`, - Called for every touch move on the View when it is not the responder: does this view want to "claim" touch responsiveness?
+
 If the View returns true and attempts to become the responder, one of the following will happen:
 
 * `View.props.onResponderGrant: (event, gestureState) => {}` - The View is now responding for touch events. This is the time to highlight and show the user what is happening
-* `View.props.onResponderReject: (event, gestureState) => {}` - Something else is the responder right now and will not release it
+
 If the view is responding, the following handlers can be called:
 
 * `View.props.onResponderMove: (event, gestureState) => {}` - The user is moving their finger
