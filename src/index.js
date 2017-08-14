@@ -110,19 +110,17 @@ export default class PanResponderView extends Component {
 	_handleMove = (ev, gestureState) => {
 		const { onPanResponderMove, lockAxis } = this.props;
 
-		if (lockAxis === AxisTypes.none) {
-			ev.preventDefault();
-		}
-		else {
+		if (lockAxis !== AxisTypes.none) {
 			if (!this._locking) {
 				const absDX = Math.abs(gestureState.dx);
 				const absDY = Math.abs(gestureState.dy);
 				this._locking = absDX > absDY ? AxisTypes.x : AxisTypes.y;
 			}
 
-			if (this._locking === lockAxis) { ev.preventDefault(); }
+			if (this._locking !== lockAxis) { return; }
 		}
 
+		ev.preventDefault();
 		onPanResponderMove(ev, gestureState);
 	};
 

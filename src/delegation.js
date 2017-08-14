@@ -139,7 +139,9 @@ const handleMove = (ev) => {
 		if (grantedNode) { grantedTouchIds.push(ev); }
 	}
 
-	if (grantedNode) { listeners.get(grantedNode).onMove(ev, gestureState); }
+	if (grantedNode) {
+		listeners.get(grantedNode).onMove(ev, gestureState);
+	}
 };
 
 const handleEnd = (ev) => {
