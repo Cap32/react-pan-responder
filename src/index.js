@@ -2,7 +2,7 @@
 import PropTypes from 'prop-types';
 import React, { Component } from 'react';
 import { findDOMNode } from 'react-dom';
-import AxisTypes from './AxisTypes';
+import TouchActions from './TouchActions';
 import delegation from './delegation';
 import { isFunction, noop } from './utils';
 
@@ -17,7 +17,7 @@ export default class PanResponderView extends Component {
 			PropTypes.string,
 			PropTypes.func,
 		]),
-		lockAxis: PropTypes.oneOf(Object.keys(AxisTypes)),
+		touchAction: PropTypes.oneOf(Object.keys(TouchActions)),
 		withRef: PropTypes.bool,
 
 		onStartShouldSetPanResponderCapture: funcOrBool,
@@ -42,11 +42,11 @@ export default class PanResponderView extends Component {
 		onStartShouldSetPanResponder: false,
 		onMoveShouldSetPanResponderCapture: false,
 		onMoveShouldSetPanResponder: false,
-		lockAxis: AxisTypes.none,
+		touchAction: TouchActions.none,
 		withRef: false,
 	};
 
-	static AxisTypes = AxisTypes;
+	static TouchActions = TouchActions;
 
 	_locking = null;
 
@@ -108,16 +108,16 @@ export default class PanResponderView extends Component {
 	};
 
 	_handleMove = (ev, gestureState) => {
-		const { onPanResponderMove, lockAxis } = this.props;
+		const { onPanResponderMove, touchAction } = this.props;
 
-		if (lockAxis !== AxisTypes.none) {
+		if (touchAction !== TouchActions.none) {
 			if (!this._locking) {
 				const absDX = Math.abs(gestureState.dx);
 				const absDY = Math.abs(gestureState.dy);
-				this._locking = absDX > absDY ? AxisTypes.x : AxisTypes.y;
+				this._locking = absDX > absDY ? TouchActions.x : TouchActions.y;
 			}
 
-			if (this._locking !== lockAxis) { return; }
+			if (this._locking !== touchAction) { return; }
 		}
 
 		ev.preventDefault();
@@ -137,7 +137,7 @@ export default class PanResponderView extends Component {
 		const {
 			props: {
 				component: Comp,
-				lockAxis,
+				touchAction,
 
 				onStartShouldSetPanResponderCapture,
 				onStartShouldSetPanResponder,

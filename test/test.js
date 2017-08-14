@@ -858,12 +858,12 @@ describe('onPanResponderEnd', function () {
 	});
 });
 
-describe('lockAxis', function () {
-	test('should fire `onPanResponderMove` if `AxisTypes.none` and panning horizontally', async () => {
+describe('touchAction', function () {
+	test('should fire `onPanResponderMove` if `TouchActions.none` and panning horizontally', async () => {
 		const handler = jest.fn();
 		wrapper = mount(
 			<PanView
-				lockAxis={PanView.AxisTypes.none}
+				touchAction={PanView.TouchActions.none}
 				onStartShouldSetPanResponder
 				onPanResponderMove={handler}
 			/>
@@ -879,11 +879,11 @@ describe('lockAxis', function () {
 		expect(handler.mock.calls.length).toEqual(2);
 	});
 
-	test('should fire `onPanResponderMove` if `AxisTypes.none` and panning vertically', async () => {
+	test('should fire `onPanResponderMove` if `TouchActions.none` and panning vertically', async () => {
 		const handler = jest.fn();
 		wrapper = mount(
 			<PanView
-				lockAxis={PanView.AxisTypes.none}
+				touchAction={PanView.TouchActions.none}
 				onStartShouldSetPanResponder
 				onPanResponderMove={handler}
 			/>
@@ -899,11 +899,11 @@ describe('lockAxis', function () {
 		expect(handler.mock.calls.length).toEqual(2);
 	});
 
-	test('should fire `onPanResponderMove` if `AxisTypes.x` and panning horizontally', async () => {
+	test('should fire `onPanResponderMove` if `TouchActions.x` and panning horizontally', async () => {
 		const handler = jest.fn();
 		wrapper = mount(
 			<PanView
-				lockAxis={PanView.AxisTypes.x}
+				touchAction={PanView.TouchActions.x}
 				onStartShouldSetPanResponder
 				onPanResponderMove={handler}
 			/>
@@ -919,11 +919,11 @@ describe('lockAxis', function () {
 		expect(handler.mock.calls.length).toEqual(2);
 	});
 
-	test('should not fire `onPanResponderMove` if `AxisTypes.x` and panning vertically', async () => {
+	test('should not fire `onPanResponderMove` if `TouchActions.x` and panning vertically', async () => {
 		const handler = jest.fn();
 		wrapper = mount(
 			<PanView
-				lockAxis={PanView.AxisTypes.x}
+				touchAction={PanView.TouchActions.x}
 				onStartShouldSetPanResponder
 				onPanResponderMove={handler}
 			/>
@@ -939,11 +939,11 @@ describe('lockAxis', function () {
 		expect(handler.mock.calls.length).toEqual(0);
 	});
 
-	test('should fire `onPanResponderMove` if `AxisTypes.y` and panning vertically', async () => {
+	test('should fire `onPanResponderMove` if `TouchActions.y` and panning vertically', async () => {
 		const handler = jest.fn();
 		wrapper = mount(
 			<PanView
-				lockAxis={PanView.AxisTypes.y}
+				touchAction={PanView.TouchActions.y}
 				onStartShouldSetPanResponder
 				onPanResponderMove={handler}
 			/>
@@ -959,11 +959,11 @@ describe('lockAxis', function () {
 		expect(handler.mock.calls.length).toEqual(2);
 	});
 
-	test('should not fire `onPanResponderMove` if `AxisTypes.y` and panning horizontally', async () => {
+	test('should not fire `onPanResponderMove` if `TouchActions.y` and panning horizontally', async () => {
 		const handler = jest.fn();
 		wrapper = mount(
 			<PanView
-				lockAxis={PanView.AxisTypes.y}
+				touchAction={PanView.TouchActions.y}
 				onStartShouldSetPanResponder
 				onPanResponderMove={handler}
 			/>

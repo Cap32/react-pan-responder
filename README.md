@@ -28,8 +28,8 @@ Low level pan gesture responder React component for DOM. This library is highly 
     - [onPanResponderMove](#onpanrespondermove)
     - [onPanResponderEnd](#onpanresponderend)
     - [onPanResponderRelease](#onpanresponderrelease)
-    - [lockAxis](#lockaxis)
-    - [static AxisTypes](#static-axistypes)
+    - [touchAction](#touchaction)
+    - [static TouchActions](#static-touchactions)
 - [License](#license)
 
 <!-- /MarkdownTOC -->
@@ -215,18 +215,18 @@ Calling for every touch end when it is the responder.
 Calling at the end of the touch, i.e. "touchUp".
 
 
-<a name="lockaxis"></a>
-### lockAxis
+<a name="touchaction"></a>
+### touchAction
 
 `string`
 
-Defining responder panning action. The value could be one of `AxisTypes.none` (default), `AxisTypes.x` or `AxisTypes.y`. See the following for detail.
+Defining responder panning action. The value could be one of `TouchActions.none` (default), `TouchActions.x` or `TouchActions.y`. See the following for detail.
 
 
-<a name="static-axistypes"></a>
-### static AxisTypes
+<a name="static-touchactions"></a>
+### static TouchActions
 
-An helper object for `lockAxis`:
+An helper object for `touchAction`:
 
 - `none`: Disable browser handling of all panning gestures.
 - `x`: Enable single-finger horizontal panning gestures.
