@@ -42,6 +42,23 @@ describe('component', function () {
 	});
 });
 
+describe('withRef', function () {
+	test('should `withRef` work', function () {
+		class Custom extends React.Component {
+			test() { return true; }
+			render() {
+				return (
+					<div />
+				);
+			}
+		}
+		wrapper = mount(
+			<PanView component={Custom} withRef />
+		);
+		expect(wrapper.get(0).getInstance().test()).toBe(true);
+	});
+});
+
 describe('onStartShouldSetPanResponder', function () {
 	test('should not grant on start by default', async () => {
 		const handler = jest.fn();

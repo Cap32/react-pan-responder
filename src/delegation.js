@@ -212,6 +212,7 @@ export default {
 		isTouch = false;
 		grantedNode = null;
 		gestureState = { stateID: Math.random() };
+		grantedTouchIds.clear();
 
 		window.removeEventListener('mousedown', handleStart, eventOptions);
 		window.removeEventListener('mousemove', handleMove, eventOptions);

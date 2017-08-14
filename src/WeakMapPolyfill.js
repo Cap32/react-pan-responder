@@ -1,7 +1,9 @@
 
 const $id = Symbol('id');
 
-export default WeakMap || (class WeakMapPolyfill {
+const supportWeakMap = typeof WeakMap === 'function';
+
+export default supportWeakMap ? WeakMap : (class WeakMapPolyfill {
 	_id = 1;
 	_maps = {};
 
@@ -16,7 +18,7 @@ export default WeakMap || (class WeakMapPolyfill {
 	}
 
 	get(object) {
-		return this.has(object) ? this._maps[object[$id]] : null;
+		return this.has(object) ? this._maps[object[$id]] : undefined;
 	}
 
 	delete(object) {
