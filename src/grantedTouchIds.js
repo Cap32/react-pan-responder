@@ -10,6 +10,11 @@ export default {
 		list.push(getChangedTouchId(ev));
 	},
 	pull(ev) {
+		if (ev.touches && !ev.touches.length) {
+			this.clear();
+			return;
+		}
+
 		const touchId = getChangedTouchId(ev);
 		const index = list.indexOf(touchId);
 		if (index > -1) { list.splice(index, 1); }
