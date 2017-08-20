@@ -6,13 +6,7 @@ import { render } from 'react-dom';
 import PanResponderView from 'index';
 import { Github, Eye, EyeOff } from 'react-feather';
 import Granim from 'granim';
-import {
-	AnimatedDiv,
-	AnimatedValue,
-	AnimatedValueXY,
-	timing,
-	Easing,
-} from 'react-web-animated';
+import { AnimatedDiv, AnimatedValue, AnimatedValueXY, timing, Easing } from 'react-web-animated';
 
 const ls = (function () {
 	const noop = () => {};
@@ -187,6 +181,11 @@ class App extends Component {
 
 		return (
 			<div className="container">
+				<article className="doc">
+					<h1>React Pan Responder View</h1>
+					<h2><a href="https://github.com/Cap32">Author: Cap32</a></h2>
+				</article>
+
 				<PanResponderView
 					className="pan-view"
 					component="canvas"
@@ -250,10 +249,6 @@ class App extends Component {
 							<Github size={22} color="white" />
 						</a>
 					</div>
-
-					<h2 className="author">
-						<a href="https://github.com/Cap32">Author: Cap32</a>
-					</h2>
 				</footer>
 			</div>
 		);
