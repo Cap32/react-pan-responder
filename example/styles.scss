@@ -28,7 +28,7 @@ a {
 	right: 0;
 	top: 0;
 	bottom: 0;
-	overflow-x: hidden;
+	overflow: hidden;
 }
 
 .pan-view {
@@ -39,7 +39,12 @@ a {
 	align-items: center;
 	position: relative;
 	background-color: #1abc9c;
-	color: #fff;
+}
+
+.touch-hint {
+	font-weight: 400;
+	opacity: 0.8;
+	pointer-events: none;
 }
 
 .tracker {
@@ -54,18 +59,14 @@ a {
 	border-radius: $width / 2;
 	background-color: rgba(white, 0.1);
 	transform-origin: center center;
+	pointer-events: none;
 }
 
 .logger {
-
-	display: none;
-
 	position: absolute;
 	z-index: 2;
-	left: 20px;
-	top: 20px;
-	padding: 20px;
-	background-color: rgba(white, 0.2);
+	left: 32px;
+	top: 32px;
 	pointer-events: none;
 
 	li {
@@ -75,29 +76,24 @@ a {
 		overflow: hidden;
 		font-weight: 300;
 		font-size: 0.72rem;
-		color: rgba(white, 0.72);
+		color: rgba(white, 0.9);
 	}
-}
-
-.touch-hint {
-	font-weight: 400;
-	opacity: 0.8;
-	pointer-events: none;
 }
 
 .footer {
 	width: 100%;
 	height: 88px;
+	padding: 0 24px;
 	position: absolute;
 	left: 0;
 	bottom: 0;
 	z-index: 2;
 	display: flex;
-	justify-content: center;
+	justify-content: space-between;
 	align-items: center;
 	opacity: 0.8;
 
-	a {
+	.button {
 		width: 44px;
 		height: 44px;
 		display: flex;
@@ -105,7 +101,46 @@ a {
 		align-items: center;
 	}
 
+	.checkbox {
+		opacity: 0;
+
+		&:checked {
+			& ~ .eye {
+				display: flex;
+			}
+
+			& ~ .eye-off {
+				display: none;
+			}
+		}
+	}
+
+	.eye {
+		display: none;
+	}
+
+	.eye-off {
+		display: flex;
+	}
+
+	.logger-switch {
+		position: absolute;
+		z-index: -1;
+		top: 0;
+		left: 0;
+	}
+
 	.author {
 		display: none;
 	}
+}
+
+.footer-left {
+	position: relative;
+}
+
+.footer-right {
+	display: flex;
+	justify-content: center;
+	align-items: center;
 }
