@@ -165,8 +165,6 @@ const handleEnd = (ev) => {
 
 	if (!numberActiveTouches) { isTouch = false; }
 
-	console.log('grantedTouchIds.getCount()', grantedTouchIds.getCount());
-
 	if (!grantedTouchIds.getCount()) {
 		grantedNode = null;
 		handler && handler.onRelease(ev, gestureState);

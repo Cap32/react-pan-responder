@@ -6,7 +6,13 @@ import { render } from 'react-dom';
 import PanResponderView from 'index';
 import { Github, Eye, EyeOff } from 'react-feather';
 import Granim from 'granim';
-import { AnimatedDiv, AnimatedValue, AnimatedValueXY, timing, Easing } from 'react-web-animated';
+import {
+	AnimatedDiv,
+	AnimatedValue,
+	AnimatedValueXY,
+	timing,
+	Easing
+} from 'react-web-animated';
 
 const ls = (function () {
 	const noop = () => {};
@@ -14,15 +20,15 @@ const ls = (function () {
 	const _ls = localStorage || {
 		getItem: noop,
 		setItem: noop,
-		removeItem: noop,
+		removeItem: noop
 	};
 
 	return {
 		has: () => _ls.getItem(_key),
 		check: () => _ls.setItem(_key, 'YES'),
-		uncheck: () => _ls.removeItem(_key),
+		uncheck: () => _ls.removeItem(_key)
 	};
-}());
+})();
 
 class Logger extends Component {
 	gestureState = {
@@ -35,7 +41,7 @@ class Logger extends Component {
 		dy: 0,
 		vx: 0,
 		vy: 0,
-		numberActiveTouches: 0,
+		numberActiveTouches: 0
 	};
 
 	toFixed(state, key) {
@@ -54,9 +60,11 @@ class Logger extends Component {
 		return (
 			<AnimatedDiv className="logger" {...this.props}>
 				<ul>
-					{Object.keys(gestureState).map((prop) =>
-						<li key={prop}>{prop}: {gestureState[prop]}</li>
-					)}
+					{Object.keys(gestureState).map(prop => (
+						<li key={prop}>
+							{prop}: {gestureState[prop]}
+						</li>
+					))}
 				</ul>
 			</AnimatedDiv>
 		);
@@ -65,16 +73,14 @@ class Logger extends Component {
 
 class App extends Component {
 	componentDidMount() {
-		new Granim({ // eslint-disable-line no-new
+		// eslint-disable-next-line no-new
+		new Granim({
 			element: '.pan-view',
 			opacity: [1, 1],
 			states: {
 				'default-state': {
-					gradients: [
-						['#834D9B', '#D04ED6'],
-						['#2AFADF', '#4C83FF'],
-					],
-					transitionSpeed: 20000,
+					gradients: [['#834D9B', '#D04ED6'], ['#2AFADF', '#4C83FF']],
+					transitionSpeed: 20000
 				}
 			}
 		});
@@ -94,12 +100,12 @@ class App extends Component {
 
 	shouldShowHint = true;
 
-	_toggleLoggerSwitch = (ev) => {
+	_toggleLoggerSwitch = ev => {
 		const { checked } = ev.currentTarget;
 		const toValue = checked ? 1 : 0;
 		ls[checked ? 'check' : 'uncheck']();
 		timing(this.loggerAnim, { toValue }).start();
-	}
+	};
 
 	_handleShouldStartCapture = () => {
 		console.log('onStartShouldSetPanResponderCapture');
@@ -126,12 +132,12 @@ class App extends Component {
 		const { x0, y0 } = gestureState;
 		const { layoutAnim, styleAnim, hintAmin, logger } = this;
 
-		styleAnim.stopAnimation((value) => {
+		styleAnim.stopAnimation(value => {
 			styleAnim.setValue(value);
 			timing(styleAnim, {
 				toValue: 1,
 				duration: 100,
-				easing: Easing.in(Easing.ease),
+				easing: Easing.in(Easing.ease)
 			}).start();
 		});
 
@@ -170,20 +176,20 @@ class App extends Component {
 		timing(styleAnim, {
 			toValue: 0,
 			duration: 600,
-			easing: Easing.out(Easing.ease),
+			easing: Easing.out(Easing.ease)
 		}).start();
 	};
 
 	render() {
-		const {
-			styleAnim, layoutAnim, loggerAnim, hintAmin,
-		} = this;
+		const { styleAnim, layoutAnim, loggerAnim, hintAmin } = this;
 
 		return (
 			<div className="container">
 				<article className="doc">
 					<h1>React Pan Responder View</h1>
-					<h2><a href="https://github.com/Cap32">Author: Cap32</a></h2>
+					<h2>
+						<a href="https://github.com/Cap32">Author: Cap32</a>
+					</h2>
 				</article>
 
 				<PanResponderView
@@ -200,10 +206,7 @@ class App extends Component {
 					onMoveShouldSetPanResponder={this._handleShouldMove}
 				/>
 
-				<AnimatedDiv
-					className="touch-hint"
-					style={{ opacity: hintAmin }}
-				>
+				<AnimatedDiv className="touch-hint" style={{ opacity: hintAmin }}>
 					Pan to Start
 				</AnimatedDiv>
 
@@ -216,15 +219,15 @@ class App extends Component {
 							{
 								scale: styleAnim.interpolate({
 									inputRange: [0, 1],
-									outputRange: [2, 1],
-								}),
-							},
-						],
+									outputRange: [2, 1]
+								})
+							}
+						]
 					}}
 				/>
 
 				<Logger
-					ref={(logger) => (this.logger = logger)}
+					ref={logger => (this.logger = logger)}
 					style={{ opacity: loggerAnim }}
 				/>
 
@@ -245,7 +248,10 @@ class App extends Component {
 					</div>
 
 					<div className="footer-right">
-						<a className="button" href="https://github.com/Cap32/react-pan-responder-view">
+						<a
+							className="button"
+							href="https://github.com/Cap32/react-pan-responder-view"
+						>
 							<Github size={22} color="white" />
 						</a>
 					</div>
@@ -255,7 +261,4 @@ class App extends Component {
 	}
 }
 
-render(
-	<App />,
-	document.getElementById('mount'),
-);
+render(<App />, document.getElementById('mount'));
