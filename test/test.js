@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { findDOMNode } from 'react-dom';
 import { JSDOM } from 'jsdom';
@@ -10,34 +9,30 @@ import delegation from '../src/delegation';
 let wrapper;
 
 beforeEach(() => {
-	const { window } = new JSDOM(
-		'<!doctype html><html><body></body></html>'
-	);
+	const { window } = new JSDOM('<!doctype html><html><body></body></html>');
 	global.window = window;
 	global.document = window.document;
 });
 
 afterEach(() => {
 	delegation.destroy();
-	if (wrapper.unmount) { wrapper.unmount(); }
+	if (wrapper.unmount) {
+		wrapper.unmount();
+	}
 });
 
 describe('component', function () {
 	test('should be a div', function () {
 		const text = 'hello world';
-		wrapper = mount(
-			<PanView>{text}</PanView>
-		);
+		wrapper = mount(<PanView>{text}</PanView>);
 		expect(wrapper.find(PanView).text()).toBe(text);
 		expect(wrapper.find(PanView).getDOMNode().nodeName).toBe('DIV');
 	});
 
 	test('should custom component work', function () {
 		const text = 'hello world';
-		const Custom = (props) => (<span {...props} />);
-		wrapper = mount(
-			<PanView component={Custom}>{text}</PanView>
-		);
+		const Custom = (props) => <span {...props} />;
+		wrapper = mount(<PanView component={Custom}>{text}</PanView>);
 		expect(wrapper.find(Custom).getDOMNode().nodeName).toBe('SPAN');
 	});
 });
@@ -45,49 +40,43 @@ describe('component', function () {
 describe('withRef', function () {
 	test('should `withRef` work', function () {
 		class Custom extends React.Component {
-			test() { return true; }
+			test() {
+				return true;
+			}
 			render() {
-				return (
-					<div />
-				);
+				return <div />;
 			}
 		}
-		wrapper = mount(
-			<PanView component={Custom} withRef />
-		);
-		expect(wrapper.get(0).getInstance().test()).toBe(true);
+		wrapper = mount(<PanView component={Custom} withRef />);
+		expect(
+			wrapper
+				.get(0)
+				.getInstance()
+				.test(),
+		).toBe(true);
 	});
 });
 
 describe('onStartShouldSetPanResponder', function () {
 	test('should not grant on start by default', async () => {
 		const handler = jest.fn();
-		wrapper = mount(
-			<PanView onPanResponderGrant={handler} />
-		);
-		await Simulator
-			.create(wrapper.find(PanView).getDOMNode())
+		wrapper = mount(<PanView onPanResponderGrant={handler} />);
+		await Simulator.create(wrapper.find(PanView).getDOMNode())
 			.touchStart()
 			.touchEnd()
-			.exec()
-		;
+			.exec();
 		expect(handler.mock.calls.length).toBe(0);
 	});
 
 	test('should grant if `onStartShouldSetPanResponder` is true', async () => {
 		const handler = jest.fn();
 		wrapper = mount(
-			<PanView
-				onStartShouldSetPanResponder
-				onPanResponderGrant={handler}
-			/>
+			<PanView onStartShouldSetPanResponder onPanResponderGrant={handler} />,
 		);
-		await Simulator
-			.create(wrapper.find(PanView).getDOMNode())
+		await Simulator.create(wrapper.find(PanView).getDOMNode())
 			.touchStart()
 			.touchEnd()
-			.exec()
-		;
+			.exec();
 		expect(handler.mock.calls.length).toBe(1);
 	});
 
@@ -98,35 +87,27 @@ describe('onStartShouldSetPanResponder', function () {
 			<PanView
 				onStartShouldSetPanResponder={shouldSetPanResponder}
 				onPanResponderGrant={handler}
-			/>
+			/>,
 		);
-		await Simulator
-			.create(wrapper.find(PanView).getDOMNode())
+		await Simulator.create(wrapper.find(PanView).getDOMNode())
 			.touchStart({ pageX: 102 })
 			.touchEnd()
 			.touchStart({ pageX: 101 })
 			.touchEnd()
 			.touchStart({ pageX: 100 })
 			.touchEnd()
-			.exec()
-		;
+			.exec();
 		expect(handler.mock.calls.length).toBe(2);
 	});
 
 	test('should `onStartShouldSetPanResponder()` `gestureState` work', async () => {
 		const handler = jest.fn();
 		const touchClient = { pageX: 100, pageY: 200 };
-		wrapper = mount(
-			<PanView
-				onStartShouldSetPanResponder={handler}
-			/>
-		);
-		await Simulator
-			.create(wrapper.find(PanView).getDOMNode())
+		wrapper = mount(<PanView onStartShouldSetPanResponder={handler} />);
+		await Simulator.create(wrapper.find(PanView).getDOMNode())
 			.touchStart(touchClient)
 			.touchEnd()
-			.exec()
-		;
+			.exec();
 		const [, gestureState] = handler.mock.calls[0];
 		expect(gestureState.dx).toEqual(0);
 		expect(gestureState.dy).toEqual(0);
@@ -148,34 +129,26 @@ describe('onStartShouldSetPanResponderCapture', function () {
 			<PanView
 				onStartShouldSetPanResponderCapture={shouldSetPanResponder}
 				onPanResponderGrant={handler}
-			/>
+			/>,
 		);
-		await Simulator
-			.create(wrapper.find(PanView).getDOMNode())
+		await Simulator.create(wrapper.find(PanView).getDOMNode())
 			.touchStart({ pageX: 102 })
 			.touchEnd()
 			.touchStart({ pageX: 101 })
 			.touchEnd()
 			.touchStart({ pageX: 100 })
-			.exec()
-		;
+			.exec();
 		expect(handler.mock.calls.length).toBe(2);
 	});
 
 	test('should `onStartShouldSetPanResponderCapture()` `gestureState` work', async () => {
 		const handler = jest.fn();
 		const touchClient = { pageX: 100, pageY: 200 };
-		wrapper = mount(
-			<PanView
-				onStartShouldSetPanResponderCapture={handler}
-			/>
-		);
-		await Simulator
-			.create(wrapper.find(PanView).getDOMNode())
+		wrapper = mount(<PanView onStartShouldSetPanResponderCapture={handler} />);
+		await Simulator.create(wrapper.find(PanView).getDOMNode())
 			.touchStart(touchClient)
 			.touchEnd()
-			.exec()
-		;
+			.exec();
 		const [, gestureState] = handler.mock.calls[0];
 		expect(gestureState.dx).toEqual(0);
 		expect(gestureState.dy).toEqual(0);
@@ -199,14 +172,12 @@ describe('onStartShouldSetPanResponderCapture', function () {
 					onStartShouldSetPanResponderCapture={() => handler(1)}
 					onStartShouldSetPanResponder={() => handler(4)}
 				/>
-			</PanView>
+			</PanView>,
 		);
-		await Simulator
-			.create(findDOMNode(wrapper.find(PanView).get(1)))
+		await Simulator.create(findDOMNode(wrapper.find(PanView).get(1)))
 			.touchStart()
 			.touchEnd()
-			.exec()
-		;
+			.exec();
 		const { calls } = handler.mock;
 		expect(calls[0][0]).toBe(1);
 		expect(calls[1][0]).toBe(2);
@@ -225,14 +196,12 @@ describe('onStartShouldSetPanResponderCapture', function () {
 					onStartShouldSetPanResponderCapture={() => handler(1) || true}
 					onStartShouldSetPanResponder={() => handler(4)}
 				/>
-			</PanView>
+			</PanView>,
 		);
-		await Simulator
-			.create(findDOMNode(wrapper.find(PanView).get(1)))
+		await Simulator.create(findDOMNode(wrapper.find(PanView).get(1)))
 			.touchStart()
 			.touchEnd()
-			.exec()
-		;
+			.exec();
 		const { calls } = handler.mock;
 		expect(calls[0][0]).toBe(1);
 		expect(calls.length).toBe(1);
@@ -242,34 +211,25 @@ describe('onStartShouldSetPanResponderCapture', function () {
 describe('onMoveShouldSetPanResponder', function () {
 	test('should not grant on move by default', async () => {
 		const handler = jest.fn();
-		wrapper = mount(
-			<PanView onPanResponderGrant={handler} />
-		);
-		await Simulator
-			.create(wrapper.find(PanView).getDOMNode())
+		wrapper = mount(<PanView onPanResponderGrant={handler} />);
+		await Simulator.create(wrapper.find(PanView).getDOMNode())
 			.touchStart()
 			.touchMove()
 			.touchEnd()
-			.exec()
-		;
+			.exec();
 		expect(handler.mock.calls.length).toBe(0);
 	});
 
 	test('should grant if `onMoveShouldSetPanResponder` is true', async () => {
 		const handler = jest.fn();
 		wrapper = mount(
-			<PanView
-				onMoveShouldSetPanResponder
-				onPanResponderGrant={handler}
-			/>
+			<PanView onMoveShouldSetPanResponder onPanResponderGrant={handler} />,
 		);
-		await Simulator
-			.create(wrapper.find(PanView).getDOMNode())
+		await Simulator.create(wrapper.find(PanView).getDOMNode())
 			.touchStart()
 			.touchMove()
 			.touchEnd()
-			.exec()
-		;
+			.exec();
 		expect(handler.mock.calls.length).toBe(1);
 	});
 
@@ -280,10 +240,9 @@ describe('onMoveShouldSetPanResponder', function () {
 			<PanView
 				onMoveShouldSetPanResponder={shouldSetPanResponder}
 				onPanResponderGrant={handler}
-			/>
+			/>,
 		);
-		await Simulator
-			.create(wrapper.find(PanView).getDOMNode())
+		await Simulator.create(wrapper.find(PanView).getDOMNode())
 			.touchStart({ pageX: 0 })
 			.touchMove({ pageX: 12 })
 			.touchEnd()
@@ -292,26 +251,19 @@ describe('onMoveShouldSetPanResponder', function () {
 			.touchEnd()
 			.touchStart({ pageX: 2 })
 			.touchMove({ pageX: 12 })
-			.exec()
-		;
+			.exec();
 		expect(handler.mock.calls.length).toBe(2);
 	});
 
 	test('should `onMoveShouldSetPanResponder()` `gestureState` work', async () => {
 		const handler = jest.fn();
 		const touchClient = { pageX: 100, pageY: 200 };
-		wrapper = mount(
-			<PanView
-				onMoveShouldSetPanResponder={handler}
-			/>
-		);
-		await Simulator
-			.create(wrapper.find(PanView).getDOMNode())
+		wrapper = mount(<PanView onMoveShouldSetPanResponder={handler} />);
+		await Simulator.create(wrapper.find(PanView).getDOMNode())
 			.touchStart(touchClient)
 			.touchMove(touchClient)
 			.touchEnd()
-			.exec()
-		;
+			.exec();
 		const [, gestureState] = handler.mock.calls[0];
 		expect(gestureState.dx).toEqual(0);
 		expect(gestureState.dy).toEqual(0);
@@ -333,10 +285,9 @@ describe('onMoveShouldSetPanResponderCapture', function () {
 			<PanView
 				onMoveShouldSetPanResponderCapture={shouldSetPanResponder}
 				onPanResponderGrant={handler}
-			/>
+			/>,
 		);
-		await Simulator
-			.create(wrapper.find(PanView).getDOMNode())
+		await Simulator.create(wrapper.find(PanView).getDOMNode())
 			.touchStart()
 			.touchMove({ pageX: 102 })
 			.touchEnd()
@@ -345,26 +296,19 @@ describe('onMoveShouldSetPanResponderCapture', function () {
 			.touchEnd()
 			.touchStart()
 			.touchMove({ pageX: 100 })
-			.exec()
-		;
+			.exec();
 		expect(handler.mock.calls.length).toBe(2);
 	});
 
 	test('should `onMoveShouldSetPanResponderCapture()` `gestureState` work', async () => {
 		const handler = jest.fn();
 		const touchClient = { pageX: 100, pageY: 200 };
-		wrapper = mount(
-			<PanView
-				onMoveShouldSetPanResponderCapture={handler}
-			/>
-		);
-		await Simulator
-			.create(wrapper.find(PanView).getDOMNode())
+		wrapper = mount(<PanView onMoveShouldSetPanResponderCapture={handler} />);
+		await Simulator.create(wrapper.find(PanView).getDOMNode())
 			.touchStart(touchClient)
 			.touchMove(touchClient)
 			.touchEnd()
-			.exec()
-		;
+			.exec();
 		const [, gestureState] = handler.mock.calls[0];
 		expect(gestureState.dx).toEqual(0);
 		expect(gestureState.dy).toEqual(0);
@@ -388,15 +332,13 @@ describe('onMoveShouldSetPanResponderCapture', function () {
 					onMoveShouldSetPanResponderCapture={() => handler(1)}
 					onMoveShouldSetPanResponder={() => handler(4)}
 				/>
-			</PanView>
+			</PanView>,
 		);
-		await Simulator
-			.create(findDOMNode(wrapper.find(PanView).get(1)))
+		await Simulator.create(findDOMNode(wrapper.find(PanView).get(1)))
 			.touchStart()
 			.touchMove()
 			.touchEnd()
-			.exec()
-		;
+			.exec();
 		const { calls } = handler.mock;
 		expect(calls[0][0]).toBe(1);
 		expect(calls[1][0]).toBe(2);
@@ -415,15 +357,13 @@ describe('onMoveShouldSetPanResponderCapture', function () {
 					onMoveShouldSetPanResponderCapture={() => handler(1) || true}
 					onMoveShouldSetPanResponder={() => handler(4)}
 				/>
-			</PanView>
+			</PanView>,
 		);
-		await Simulator
-			.create(findDOMNode(wrapper.find(PanView).get(1)))
+		await Simulator.create(findDOMNode(wrapper.find(PanView).get(1)))
 			.touchStart()
 			.touchMove()
 			.touchEnd()
-			.exec()
-		;
+			.exec();
 		const { calls } = handler.mock;
 		expect(calls[0][0]).toBe(1);
 		expect(calls.length).toBe(1);
@@ -434,34 +374,24 @@ describe('onPanResponderGrant', function () {
 	test('should grant on touch start', async () => {
 		const handler = jest.fn();
 		wrapper = mount(
-			<PanView
-				onStartShouldSetPanResponder
-				onPanResponderGrant={handler}
-			/>
+			<PanView onStartShouldSetPanResponder onPanResponderGrant={handler} />,
 		);
-		await Simulator
-			.create(wrapper.find(PanView).getDOMNode())
+		await Simulator.create(wrapper.find(PanView).getDOMNode())
 			.touchStart()
 			.touchEnd()
-			.exec()
-		;
+			.exec();
 		expect(handler.mock.calls.length).toBe(1);
 	});
 
 	test('should grant on mouse down', async () => {
 		const handler = jest.fn();
 		wrapper = mount(
-			<PanView
-				onStartShouldSetPanResponder
-				onPanResponderGrant={handler}
-			/>
+			<PanView onStartShouldSetPanResponder onPanResponderGrant={handler} />,
 		);
-		await Simulator
-			.create(wrapper.find(PanView).getDOMNode())
+		await Simulator.create(wrapper.find(PanView).getDOMNode())
 			.mouseDown()
 			.mouseUp()
-			.exec()
-		;
+			.exec();
 		expect(handler.mock.calls.length).toBe(1);
 	});
 
@@ -469,17 +399,12 @@ describe('onPanResponderGrant', function () {
 		const handler = jest.fn();
 		const touchClient = { pageX: 100, pageY: 200 };
 		wrapper = mount(
-			<PanView
-				onStartShouldSetPanResponder
-				onPanResponderGrant={handler}
-			/>
+			<PanView onStartShouldSetPanResponder onPanResponderGrant={handler} />,
 		);
-		await Simulator
-			.create(wrapper.find(PanView).getDOMNode())
+		await Simulator.create(wrapper.find(PanView).getDOMNode())
 			.touchStart(touchClient)
 			.touchEnd()
-			.exec()
-		;
+			.exec();
 
 		const [, gestureState] = handler.mock.calls[0];
 		expect(gestureState.dx).toEqual(0);
@@ -500,10 +425,9 @@ describe('onPanResponderGrant', function () {
 				onStartShouldSetPanResponder
 				onMoveShouldSetPanResponder
 				onPanResponderGrant={handler}
-			/>
+			/>,
 		);
-		await Simulator
-			.create(wrapper.find(PanView).getDOMNode())
+		await Simulator.create(wrapper.find(PanView).getDOMNode())
 			.touchStart({}, 1)
 			.touchStart({}, 2)
 			.touchMove({}, 1)
@@ -511,8 +435,7 @@ describe('onPanResponderGrant', function () {
 			.touchMove({}, 2)
 			.touchEnd({}, 1)
 			.touchEnd({}, 2)
-			.exec()
-		;
+			.exec();
 		expect(handler.mock.calls.length).toBe(1);
 	});
 });
@@ -521,34 +444,24 @@ describe('onPanResponderStart', function () {
 	test('should start on touch start', async () => {
 		const handler = jest.fn();
 		wrapper = mount(
-			<PanView
-				onStartShouldSetPanResponder
-				onPanResponderStart={handler}
-			/>
+			<PanView onStartShouldSetPanResponder onPanResponderStart={handler} />,
 		);
-		await Simulator
-			.create(wrapper.find(PanView).getDOMNode())
+		await Simulator.create(wrapper.find(PanView).getDOMNode())
 			.touchStart()
 			.touchEnd()
-			.exec()
-		;
+			.exec();
 		expect(handler.mock.calls.length).toBe(1);
 	});
 
 	test('should start on mouse down', async () => {
 		const handler = jest.fn();
 		wrapper = mount(
-			<PanView
-				onStartShouldSetPanResponder
-				onPanResponderStart={handler}
-			/>
+			<PanView onStartShouldSetPanResponder onPanResponderStart={handler} />,
 		);
-		await Simulator
-			.create(wrapper.find(PanView).getDOMNode())
+		await Simulator.create(wrapper.find(PanView).getDOMNode())
 			.mouseDown()
 			.mouseUp()
-			.exec()
-		;
+			.exec();
 		expect(handler.mock.calls.length).toBe(1);
 	});
 
@@ -556,17 +469,12 @@ describe('onPanResponderStart', function () {
 		const handler = jest.fn();
 		const touchClient = { pageX: 100, pageY: 200 };
 		wrapper = mount(
-			<PanView
-				onStartShouldSetPanResponder
-				onPanResponderStart={handler}
-			/>
+			<PanView onStartShouldSetPanResponder onPanResponderStart={handler} />,
 		);
-		await Simulator
-			.create(wrapper.find(PanView).getDOMNode())
+		await Simulator.create(wrapper.find(PanView).getDOMNode())
 			.touchStart(touchClient)
 			.touchEnd()
-			.exec()
-		;
+			.exec();
 		const [, gestureState] = handler.mock.calls[0];
 		expect(gestureState.dx).toEqual(0);
 		expect(gestureState.dy).toEqual(0);
@@ -582,19 +490,14 @@ describe('onPanResponderStart', function () {
 	test('should start multiple time', async () => {
 		const handler = jest.fn();
 		wrapper = mount(
-			<PanView
-				onStartShouldSetPanResponder
-				onPanResponderStart={handler}
-			/>
+			<PanView onStartShouldSetPanResponder onPanResponderStart={handler} />,
 		);
-		await Simulator
-			.create(wrapper.find(PanView).getDOMNode())
+		await Simulator.create(wrapper.find(PanView).getDOMNode())
 			.touchStart({}, 1)
 			.touchStart({}, 2)
 			.touchEnd({}, 1)
 			.touchEnd({}, 2)
-			.exec()
-		;
+			.exec();
 		expect(handler.mock.calls.length).toBe(2);
 	});
 });
@@ -603,36 +506,26 @@ describe('onPanResponderMove', function () {
 	test('should move on touch move', async () => {
 		const handler = jest.fn();
 		wrapper = mount(
-			<PanView
-				onStartShouldSetPanResponder
-				onPanResponderMove={handler}
-			/>
+			<PanView onStartShouldSetPanResponder onPanResponderMove={handler} />,
 		);
-		await Simulator
-			.create(wrapper.find(PanView).getDOMNode())
+		await Simulator.create(wrapper.find(PanView).getDOMNode())
 			.touchStart()
 			.touchMove()
 			.touchEnd()
-			.exec()
-		;
+			.exec();
 		expect(handler.mock.calls.length).toBe(1);
 	});
 
 	test('should move on mouse move', async () => {
 		const handler = jest.fn();
 		wrapper = mount(
-			<PanView
-				onStartShouldSetPanResponder
-				onPanResponderMove={handler}
-			/>
+			<PanView onStartShouldSetPanResponder onPanResponderMove={handler} />,
 		);
-		await Simulator
-			.create(wrapper.find(PanView).getDOMNode())
+		await Simulator.create(wrapper.find(PanView).getDOMNode())
 			.mouseDown()
 			.mouseMove()
 			.mouseUp()
-			.exec()
-		;
+			.exec();
 		expect(handler.mock.calls.length).toBe(1);
 	});
 
@@ -641,21 +534,16 @@ describe('onPanResponderMove', function () {
 		const touchClient = { pageX: 100, pageY: 200 };
 		const delta = { x: 10, y: -20 };
 		wrapper = mount(
-			<PanView
-				onStartShouldSetPanResponder
-				onPanResponderMove={handler}
-			/>
+			<PanView onStartShouldSetPanResponder onPanResponderMove={handler} />,
 		);
-		await Simulator
-			.create(wrapper.find(PanView).getDOMNode())
+		await Simulator.create(wrapper.find(PanView).getDOMNode())
 			.touchStart(touchClient)
 			.touchMove({
 				pageX: touchClient.pageX + delta.x,
 				pageY: touchClient.pageY + delta.y,
 			})
 			.touchEnd()
-			.exec()
-		;
+			.exec();
 		const [, gestureState] = handler.mock.calls[0];
 		expect(gestureState.dx).toEqual(delta.x);
 		expect(gestureState.dy).toEqual(delta.y);
@@ -671,20 +559,15 @@ describe('onPanResponderMove', function () {
 	test('should move multiple time', async () => {
 		const handler = jest.fn();
 		wrapper = mount(
-			<PanView
-				onStartShouldSetPanResponder
-				onPanResponderMove={handler}
-			/>
+			<PanView onStartShouldSetPanResponder onPanResponderMove={handler} />,
 		);
-		await Simulator
-			.create(wrapper.find(PanView).getDOMNode())
+		await Simulator.create(wrapper.find(PanView).getDOMNode())
 			.touchStart()
 			.touchMove()
 			.touchMove()
 			.touchMove()
 			.touchEnd()
-			.exec()
-		;
+			.exec();
 		expect(handler.mock.calls.length).toBe(3);
 	});
 });
@@ -693,34 +576,24 @@ describe('onPanResponderRelease', function () {
 	test('should release on last touch end', async () => {
 		const handler = jest.fn();
 		wrapper = mount(
-			<PanView
-				onStartShouldSetPanResponder
-				onPanResponderRelease={handler}
-			/>
+			<PanView onStartShouldSetPanResponder onPanResponderRelease={handler} />,
 		);
-		await Simulator
-			.create(wrapper.find(PanView).getDOMNode())
+		await Simulator.create(wrapper.find(PanView).getDOMNode())
 			.touchStart()
 			.touchEnd()
-			.exec()
-		;
+			.exec();
 		expect(handler.mock.calls.length).toBe(1);
 	});
 
 	test('should release on mouse up', async () => {
 		const handler = jest.fn();
 		wrapper = mount(
-			<PanView
-				onStartShouldSetPanResponder
-				onPanResponderRelease={handler}
-			/>
+			<PanView onStartShouldSetPanResponder onPanResponderRelease={handler} />,
 		);
-		await Simulator
-			.create(wrapper.find(PanView).getDOMNode())
+		await Simulator.create(wrapper.find(PanView).getDOMNode())
 			.mouseDown()
 			.mouseUp()
-			.exec()
-		;
+			.exec();
 		expect(handler.mock.calls.length).toBe(1);
 	});
 
@@ -728,17 +601,12 @@ describe('onPanResponderRelease', function () {
 		const handler = jest.fn();
 		const touchClient = { pageX: 100, pageY: 200 };
 		wrapper = mount(
-			<PanView
-				onStartShouldSetPanResponder
-				onPanResponderRelease={handler}
-			/>
+			<PanView onStartShouldSetPanResponder onPanResponderRelease={handler} />,
 		);
-		await Simulator
-			.create(wrapper.find(PanView).getDOMNode())
+		await Simulator.create(wrapper.find(PanView).getDOMNode())
 			.touchStart(touchClient)
 			.touchEnd()
-			.exec()
-		;
+			.exec();
 
 		const [, gestureState] = handler.mock.calls[0];
 		expect(gestureState.dx).toEqual(0);
@@ -759,10 +627,9 @@ describe('onPanResponderRelease', function () {
 				onStartShouldSetPanResponder
 				onMoveShouldSetPanResponder
 				onPanResponderRelease={handler}
-			/>
+			/>,
 		);
-		await Simulator
-			.create(wrapper.find(PanView).getDOMNode())
+		await Simulator.create(wrapper.find(PanView).getDOMNode())
 			.touchStart({}, 1)
 			.touchStart({}, 2)
 			.touchMove({}, 1)
@@ -770,8 +637,7 @@ describe('onPanResponderRelease', function () {
 			.touchMove({}, 2)
 			.touchEnd({}, 1)
 			.touchEnd({}, 2)
-			.exec()
-		;
+			.exec();
 		expect(handler.mock.calls.length).toBe(1);
 	});
 });
@@ -780,34 +646,24 @@ describe('onPanResponderEnd', function () {
 	test('should end on last touch end', async () => {
 		const handler = jest.fn();
 		wrapper = mount(
-			<PanView
-				onStartShouldSetPanResponder
-				onPanResponderEnd={handler}
-			/>
+			<PanView onStartShouldSetPanResponder onPanResponderEnd={handler} />,
 		);
-		await Simulator
-			.create(wrapper.find(PanView).getDOMNode())
+		await Simulator.create(wrapper.find(PanView).getDOMNode())
 			.touchStart()
 			.touchEnd()
-			.exec()
-		;
+			.exec();
 		expect(handler.mock.calls.length).toBe(1);
 	});
 
 	test('should end on mouse up', async () => {
 		const handler = jest.fn();
 		wrapper = mount(
-			<PanView
-				onStartShouldSetPanResponder
-				onPanResponderEnd={handler}
-			/>
+			<PanView onStartShouldSetPanResponder onPanResponderEnd={handler} />,
 		);
-		await Simulator
-			.create(wrapper.find(PanView).getDOMNode())
+		await Simulator.create(wrapper.find(PanView).getDOMNode())
 			.mouseDown()
 			.mouseUp()
-			.exec()
-		;
+			.exec();
 		expect(handler.mock.calls.length).toBe(1);
 	});
 
@@ -815,17 +671,12 @@ describe('onPanResponderEnd', function () {
 		const handler = jest.fn();
 		const touchClient = { pageX: 100, pageY: 200 };
 		wrapper = mount(
-			<PanView
-				onStartShouldSetPanResponder
-				onPanResponderEnd={handler}
-			/>
+			<PanView onStartShouldSetPanResponder onPanResponderEnd={handler} />,
 		);
-		await Simulator
-			.create(wrapper.find(PanView).getDOMNode())
+		await Simulator.create(wrapper.find(PanView).getDOMNode())
 			.touchStart(touchClient)
 			.touchEnd()
-			.exec()
-		;
+			.exec();
 		const [, gestureState] = handler.mock.calls[0];
 		expect(gestureState.dx).toEqual(0);
 		expect(gestureState.dy).toEqual(0);
@@ -841,19 +692,14 @@ describe('onPanResponderEnd', function () {
 	test('should end multiple time', async () => {
 		const handler = jest.fn();
 		wrapper = mount(
-			<PanView
-				onStartShouldSetPanResponder
-				onPanResponderEnd={handler}
-			/>
+			<PanView onStartShouldSetPanResponder onPanResponderEnd={handler} />,
 		);
-		await Simulator
-			.create(wrapper.find(PanView).getDOMNode())
+		await Simulator.create(wrapper.find(PanView).getDOMNode())
 			.touchStart({}, 1)
 			.touchStart({}, 2)
 			.touchEnd({}, 1)
 			.touchEnd({}, 2)
-			.exec()
-		;
+			.exec();
 		expect(handler.mock.calls.length).toBe(2);
 	});
 });
@@ -866,16 +712,14 @@ describe('touchAction', function () {
 				touchAction={PanView.TouchActions.none}
 				onStartShouldSetPanResponder
 				onPanResponderMove={handler}
-			/>
+			/>,
 		);
-		await Simulator
-			.create(wrapper.find(PanView).getDOMNode())
+		await Simulator.create(wrapper.find(PanView).getDOMNode())
 			.touchStart()
 			.touchMove({ pageX: 20, pageY: 10 })
 			.touchMove({ pageX: 20, pageY: 100 })
 			.touchEnd()
-			.exec()
-		;
+			.exec();
 		expect(handler.mock.calls.length).toEqual(2);
 	});
 
@@ -886,16 +730,14 @@ describe('touchAction', function () {
 				touchAction={PanView.TouchActions.none}
 				onStartShouldSetPanResponder
 				onPanResponderMove={handler}
-			/>
+			/>,
 		);
-		await Simulator
-			.create(wrapper.find(PanView).getDOMNode())
+		await Simulator.create(wrapper.find(PanView).getDOMNode())
 			.touchStart()
 			.touchMove({ pageX: 10, pageY: 20 })
 			.touchMove({ pageX: 100, pageY: 20 })
 			.touchEnd()
-			.exec()
-		;
+			.exec();
 		expect(handler.mock.calls.length).toEqual(2);
 	});
 
@@ -906,16 +748,14 @@ describe('touchAction', function () {
 				touchAction={PanView.TouchActions.x}
 				onStartShouldSetPanResponder
 				onPanResponderMove={handler}
-			/>
+			/>,
 		);
-		await Simulator
-			.create(wrapper.find(PanView).getDOMNode())
+		await Simulator.create(wrapper.find(PanView).getDOMNode())
 			.touchStart()
 			.touchMove({ pageX: 20, pageY: 10 })
 			.touchMove({ pageX: 20, pageY: 100 })
 			.touchEnd()
-			.exec()
-		;
+			.exec();
 		expect(handler.mock.calls.length).toEqual(2);
 	});
 
@@ -926,16 +766,14 @@ describe('touchAction', function () {
 				touchAction={PanView.TouchActions.x}
 				onStartShouldSetPanResponder
 				onPanResponderMove={handler}
-			/>
+			/>,
 		);
-		await Simulator
-			.create(wrapper.find(PanView).getDOMNode())
+		await Simulator.create(wrapper.find(PanView).getDOMNode())
 			.touchStart()
 			.touchMove({ pageX: 10, pageY: 20 })
 			.touchMove({ pageX: 100, pageY: 20 })
 			.touchEnd()
-			.exec()
-		;
+			.exec();
 		expect(handler.mock.calls.length).toEqual(0);
 	});
 
@@ -946,16 +784,14 @@ describe('touchAction', function () {
 				touchAction={PanView.TouchActions.y}
 				onStartShouldSetPanResponder
 				onPanResponderMove={handler}
-			/>
+			/>,
 		);
-		await Simulator
-			.create(wrapper.find(PanView).getDOMNode())
+		await Simulator.create(wrapper.find(PanView).getDOMNode())
 			.touchStart()
 			.touchMove({ pageX: 10, pageY: 20 })
 			.touchMove({ pageX: 100, pageY: 20 })
 			.touchEnd()
-			.exec()
-		;
+			.exec();
 		expect(handler.mock.calls.length).toEqual(2);
 	});
 
@@ -966,16 +802,14 @@ describe('touchAction', function () {
 				touchAction={PanView.TouchActions.y}
 				onStartShouldSetPanResponder
 				onPanResponderMove={handler}
-			/>
+			/>,
 		);
-		await Simulator
-			.create(wrapper.find(PanView).getDOMNode())
+		await Simulator.create(wrapper.find(PanView).getDOMNode())
 			.touchStart()
 			.touchMove({ pageX: 20, pageY: 10 })
 			.touchMove({ pageX: 20, pageY: 100 })
 			.touchEnd()
-			.exec()
-		;
+			.exec();
 		expect(handler.mock.calls.length).toEqual(0);
 	});
 });

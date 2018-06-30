@@ -1,4 +1,3 @@
-
 import delay from 'delay';
 import { getElementPath } from '../src/utils';
 
@@ -39,7 +38,7 @@ export default class Simulator {
 
 	_pushTouch(touch) {
 		const index = this._touches.findIndex(
-			(t) => t.identifier === touch.identifier
+			(t) => t.identifier === touch.identifier,
 		);
 
 		if (index > -1) {
@@ -53,7 +52,7 @@ export default class Simulator {
 
 	_dropTouch(touch) {
 		const index = this._touches.findIndex(
-			(t) => t.identifier === touch.identifier
+			(t) => t.identifier === touch.identifier,
 		);
 		if (index > -1) {
 			this._touches.splice(index, 1);
@@ -65,33 +64,32 @@ export default class Simulator {
 		const event = document.createEvent('MouseEvents');
 
 		event.initMouseEvent(
-			eventType,								// type
-			true,											// canBubble
-			true,											// cancelable
-			window,										// view
-			1,												// detail
-			data.screenX,						// screenX
-			data.screenY,						// screenY
-			data.clientX,						// clientX
-			data.clientY,						// clientY
-			data.pageX,							// pageX
-			data.pageY,							// pageY
-			false,										// ctrlKey
-			false,										// altKey
-			false,										// shiftKey
-			false,										// metaKey
-			0,												// button
-			null,											// relatedTarget
+			eventType, // type
+			true, // canBubble
+			true, // cancelable
+			window, // view
+			1, // detail
+			data.screenX, // screenX
+			data.screenY, // screenY
+			data.clientX, // clientX
+			data.clientY, // clientY
+			data.pageX, // pageX
+			data.pageY, // pageY
+			false, // ctrlKey
+			false, // altKey
+			false, // shiftKey
+			false, // metaKey
+			0, // button
+			null, // relatedTarget
 		);
 
 		if (eventType.startsWith('touch')) {
 			event.touches = this._touches;
 			event.changedTouches = this._changedTouches;
 		}
-		event.path = [
-			...getElementPath({ target: this._domNode }),
-			window,
-		].filter((d, index, arr) => arr.indexOf(d) === index);
+		event.path = [...getElementPath({ target: this._domNode }), window].filter(
+			(d, index, arr) => arr.indexOf(d) === index,
+		);
 
 		window.dispatchEvent(event);
 	}
@@ -102,9 +100,7 @@ export default class Simulator {
 	}
 
 	_pushMouseAction(eventType, data) {
-		return this._push(() =>
-			this._perform(eventType, this._ensureData(data)),
-		);
+		return this._push(() => this._perform(eventType, this._ensureData(data)));
 	}
 
 	mouseDown(data) {

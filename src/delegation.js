@@ -1,4 +1,3 @@
-
 import grantedTouchIds from './grantedTouchIds';
 import { createEventOptions, getElementPath } from './utils';
 import WeakMap from './WeakMapPolyfill';
@@ -10,7 +9,6 @@ let hasWindowListener = false;
 let grantedNode = null;
 
 let gestureState = {
-
 	// Useful for debugging
 	stateID: Math.random(),
 };
@@ -62,8 +60,7 @@ const makeGetTouchInfo = (ev) => {
 };
 
 const getNumberActiveTouches = (ev) =>
-	ev.touches ? ev.touches.length : (ev.type === 'mouseup' ? 0 : 1)
-;
+	ev.touches ? ev.touches.length : ev.type === 'mouseup' ? 0 : 1;
 
 const handleStart = (ev) => {
 	isTouch = ev.type === 'touchstart';
@@ -105,14 +102,20 @@ const handleStart = (ev) => {
 };
 
 const handleMove = (ev) => {
-	if (isTouch && ev.type !== 'touchmove') { return; }
-	if (!gestureState.numberActiveTouches) { return; }
+	if (isTouch && ev.type !== 'touchmove') {
+		return;
+	}
+	if (!gestureState.numberActiveTouches) {
+		return;
+	}
 
 	// ev.timeStamp is not accurate
 	const timeStamp = Date.now();
 	const deltaTime = timeStamp - mostRecentTimeStamp;
 
-	if (!deltaTime) { return; }
+	if (!deltaTime) {
+		return;
+	}
 
 	const getTouch = makeGetTouchInfo(ev);
 	const numberActiveTouches = getNumberActiveTouches(ev);
@@ -136,7 +139,9 @@ const handleMove = (ev) => {
 
 	if (!hasGranted) {
 		grantedNode = setGrantedNodeOnMove(ev);
-		if (grantedNode) { grantedTouchIds.push(ev); }
+		if (grantedNode) {
+			grantedTouchIds.push(ev);
+		}
 	}
 
 	if (grantedNode) {
@@ -150,8 +155,12 @@ const handleEnd = (ev) => {
 		window.removeEventListener('mouseup', handleEnd, eventOptions);
 	}
 
-	if (isTouch && ev.type !== 'touchend') { return; }
-	if (!gestureState.numberActiveTouches) { return; }
+	if (isTouch && ev.type !== 'touchend') {
+		return;
+	}
+	if (!gestureState.numberActiveTouches) {
+		return;
+	}
 
 	let handler;
 	const numberActiveTouches = getNumberActiveTouches(ev);
@@ -163,7 +172,9 @@ const handleEnd = (ev) => {
 		handler.onEnd(ev, gestureState);
 	}
 
-	if (!numberActiveTouches) { isTouch = false; }
+	if (!numberActiveTouches) {
+		isTouch = false;
+	}
 
 	if (!grantedTouchIds.getCount()) {
 		grantedNode = null;
@@ -188,11 +199,15 @@ const ensureWindowListener = () => {
 
 export default {
 	init() {
-		if (!hasWindowListener) { ensureWindowListener(); }
+		if (!hasWindowListener) {
+			ensureWindowListener();
+		}
 	},
 
 	addListener(domNode, handlers) {
-		if (!domNode || listeners.has(domNode)) { return false; }
+		if (!domNode || listeners.has(domNode)) {
+			return false;
+		}
 
 		listeners.set(domNode, {
 			capture: false,

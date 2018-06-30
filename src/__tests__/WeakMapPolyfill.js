@@ -1,5 +1,3 @@
-
-
 let nativeWeakMap;
 
 beforeAll(() => {
@@ -12,7 +10,6 @@ afterAll(() => {
 });
 
 test('should `WeakMapPolyfill` work', () => {
-
 	const WeakMapPolyfill = require('../WeakMapPolyfill').default;
 	const weakMap = new WeakMapPolyfill();
 	const obj = {};

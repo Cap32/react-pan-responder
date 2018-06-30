@@ -1,4 +1,3 @@
-
 import PropTypes from 'prop-types';
 import React, { Component } from 'react';
 import { findDOMNode } from 'react-dom';
@@ -6,17 +5,11 @@ import TouchActions from './TouchActions';
 import delegation from './delegation';
 import { isFunction, noop } from './utils';
 
-const funcOrBool = PropTypes.oneOfType([
-	PropTypes.func,
-	PropTypes.bool,
-]);
+const funcOrBool = PropTypes.oneOfType([PropTypes.func, PropTypes.bool]);
 
 export default class PanResponderView extends Component {
 	static propTypes = {
-		component: PropTypes.oneOfType([
-			PropTypes.string,
-			PropTypes.func,
-		]),
+		component: PropTypes.oneOfType([PropTypes.string, PropTypes.func]),
 		touchAction: PropTypes.oneOf(Object.keys(TouchActions)),
 		withRef: PropTypes.bool,
 
@@ -117,7 +110,9 @@ export default class PanResponderView extends Component {
 				this._locking = absDX > absDY ? TouchActions.x : TouchActions.y;
 			}
 
-			if (this._locking !== touchAction) { return; }
+			if (this._locking !== touchAction) {
+				return;
+			}
 		}
 
 		ev.preventDefault();
@@ -150,15 +145,10 @@ export default class PanResponderView extends Component {
 				onPanResponderEnd,
 				withRef,
 
-				...other,
+				...other
 			},
 		} = this;
 
-		return (
-			<Comp
-				{...other}
-				{...this._refs}
-			/>
-		);
+		return <Comp {...other} {...this._refs} />;
 	}
 }
