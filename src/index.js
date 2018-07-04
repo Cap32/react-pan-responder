@@ -1,6 +1,7 @@
+/* eslint react/no-find-dom-node: 0 */
+
+import { Component, Children } from 'react';
 import PropTypes from 'prop-types';
-import React, { Component } from 'react';
-import { findDOMNode } from 'react-dom';
 import TouchActions from './TouchActions';
 import delegation from './delegation';
 import { isFunction, noop } from './utils';
@@ -9,66 +10,69 @@ const funcOrBool = PropTypes.oneOfType([PropTypes.func, PropTypes.bool]);
 
 export default class PanResponderView extends Component {
 	static propTypes = {
-		component: PropTypes.oneOfType([PropTypes.string, PropTypes.func]),
+		children: PropTypes.func.isRequired,
 		touchAction: PropTypes.oneOf(Object.keys(TouchActions)),
-		withRef: PropTypes.bool,
 
 		onStartShouldSetPanResponderCapture: funcOrBool,
 		onStartShouldSetPanResponder: funcOrBool,
 		onMoveShouldSetPanResponderCapture: funcOrBool,
 		onMoveShouldSetPanResponder: funcOrBool,
+		onPanResponderTerminationRequest: funcOrBool,
 		onPanResponderStart: PropTypes.func,
 		onPanResponderGrant: PropTypes.func,
+		onPanResponderReject: PropTypes.func,
 		onPanResponderMove: PropTypes.func,
 		onPanResponderEnd: PropTypes.func,
 		onPanResponderRelease: PropTypes.func,
+		onPanResponderTerminate: PropTypes.func,
 	};
 
 	static defaultProps = {
-		component: 'div',
 		onPanResponderStart: noop,
 		onPanResponderGrant: noop,
 		onPanResponderMove: noop,
 		onPanResponderRelease: noop,
 		onPanResponderEnd: noop,
+		onPanResponderReject: noop,
+		onPanResponderTerminate: noop,
 		onStartShouldSetPanResponderCapture: false,
 		onStartShouldSetPanResponder: false,
 		onMoveShouldSetPanResponderCapture: false,
 		onMoveShouldSetPanResponder: false,
+		onPanResponderTerminationRequest: false,
 		touchAction: TouchActions.none,
-		withRef: false,
 	};
 
 	static TouchActions = TouchActions;
 
 	_locking = null;
 
-	_refs = this.props.withRef ? { ref: (c) => (this.ref = c) } : {};
+	getDOMNodeByRef = (dom) => (this.dom = dom);
 
-	componentWillMount() {
+	constructor(props) {
+		super(props);
 		delegation.init();
 	}
 
 	componentDidMount() {
-		delegation.addListener(findDOMNode(this), {
+		delegation.addListener(this, {
 			onShouldStartCapture: this._handleShouldStartCapture,
 			onShouldStart: this._handleShouldStart,
 			onShouldMoveCapture: this._handleShouldMoveCapture,
 			onShouldMove: this._handleShouldMove,
 			onGrant: this._handleGrant,
+			onReject: this._handleReject,
 			onStart: this._handleStart,
 			onMove: this._handleMove,
 			onRelease: this._handleRelease,
 			onEnd: this._handleEnd,
+			onRequestTerminate: this._handleRequestTerminate,
+			onTerminate: this._handleTerminate,
 		});
 	}
 
 	componentWillUnmount() {
-		delegation.removeListener(findDOMNode(this));
-	}
-
-	getInstance() {
-		return this.ref;
+		delegation.removeListener(this);
 	}
 
 	_handleShouldStartCapture = (...args) => {
@@ -128,27 +132,20 @@ export default class PanResponderView extends Component {
 		this.props.onPanResponderRelease(...args);
 	};
 
+	_handleReject = (...args) => {
+		this.props.onPanResponderReject(...args);
+	};
+
+	_handleTerminate = (...args) => {
+		this.props.onPanResponderTerminate(...args);
+	};
+
+	_handleRequestTerminate = (...args) => {
+		const { onPanResponderTerminationRequest: should } = this.props;
+		return isFunction(should) ? should(...args) : should;
+	};
+
 	render() {
-		const {
-			props: {
-				component: Comp,
-				touchAction,
-
-				onStartShouldSetPanResponderCapture,
-				onStartShouldSetPanResponder,
-				onMoveShouldSetPanResponderCapture,
-				onMoveShouldSetPanResponder,
-				onPanResponderGrant,
-				onPanResponderStart,
-				onPanResponderMove,
-				onPanResponderRelease,
-				onPanResponderEnd,
-				withRef,
-
-				...other
-			},
-		} = this;
-
-		return <Comp {...other} {...this._refs} />;
+		return Children.only(this.props.children(this.getDOMNodeByRef));
 	}
 }

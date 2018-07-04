@@ -1,9 +1,12 @@
 import grantedTouchIds from './grantedTouchIds';
-import { createEventOptions, getElementPath } from './utils';
+import { createEventOptions, getEventNodes, includes } from './utils';
 import WeakMap from './WeakMapPolyfill';
 
-const eventOptions = createEventOptions(true);
+const eventOptions = createEventOptions();
 
+let lastStartTimeStamp = 0;
+let lastEventType;
+let lastMoveTimeStamp = 0;
 let isTouch = false;
 let hasWindowListener = false;
 let grantedNode = null;
@@ -27,27 +30,45 @@ const getDefaultGestureState = () => ({
 
 const listeners = new WeakMap();
 
-let mostRecentTimeStamp = 0;
-
 const makeSetGrantedNode = (action) => (ev) => {
+	const tempGrantedNodes = [];
 	const findAndExec = (arr, methodName) => {
-		if (!grantedNode) {
-			for (const node of arr) {
-				if (listeners.has(node)) {
-					const handler = listeners.get(node);
-					if (handler[methodName](ev, gestureState)) {
-						grantedNode = node;
+		for (const node of arr) {
+			if (grantedNode !== node && listeners.has(node)) {
+				const handler = listeners.get(node);
+				if (handler[methodName](ev, gestureState)) {
+					if (!includes(tempGrantedNodes, node)) {
+						if (!grantedNode) grantedNode = node;
+						else tempGrantedNodes.push(node);
 						handler.onGrant(ev, gestureState);
-						break;
 					}
 				}
 			}
 		}
 	};
 
-	const elementPath = getElementPath(ev);
-	findAndExec(elementPath, `onShould${action}Capture`);
-	findAndExec(elementPath.reverse(), `onShould${action}`);
+	const nodes = getEventNodes(ev);
+	findAndExec(nodes.reverse(), `onShould${action}Capture`);
+	findAndExec(nodes.reverse(), `onShould${action}`);
+
+	if (tempGrantedNodes.length) {
+		const grantedHandler = listeners.get(grantedNode);
+
+		tempGrantedNodes.forEach((node) => {
+			const handler = listeners.get(node);
+			const shouldTerminate = grantedHandler.onRequestTerminate(
+				ev,
+				gestureState,
+			);
+			if (shouldTerminate) {
+				grantedHandler.onTerminate(ev, gestureState);
+			}
+			else {
+				handler.onReject(ev, gestureState);
+			}
+		});
+	}
+
 	return grantedNode;
 };
 
@@ -63,7 +84,15 @@ const getNumberActiveTouches = (ev) =>
 	ev.touches ? ev.touches.length : ev.type === 'mouseup' ? 0 : 1;
 
 const handleStart = (ev) => {
-	isTouch = ev.type === 'touchstart';
+	const { type, timeStamp = 0 } = ev;
+	const lastDeltaTime = timeStamp - lastStartTimeStamp;
+	const lastTypeIsTouch = lastEventType === 'touchstart';
+
+	isTouch = type === 'touchstart';
+	lastStartTimeStamp = timeStamp;
+	lastEventType = type;
+
+	if (lastDeltaTime < 300 && type === 'mousedown' && lastTypeIsTouch) return;
 
 	if (!isTouch) {
 		window.addEventListener('mousemove', handleMove, eventOptions);
@@ -76,9 +105,9 @@ const handleStart = (ev) => {
 	if (grantedNode && listeners.has(grantedNode) && numberActiveTouches > 1) {
 		gestureState.numberActiveTouches = numberActiveTouches;
 
-		const elementPath = getElementPath(ev);
+		const nodes = getEventNodes(ev);
 
-		if (elementPath.indexOf(grantedNode) > -1) {
+		if (includes(nodes, grantedNode)) {
 			grantedTouchIds.push(ev);
 			listeners.get(grantedNode).onStart(ev, gestureState);
 		}
@@ -102,20 +131,14 @@ const handleStart = (ev) => {
 };
 
 const handleMove = (ev) => {
-	if (isTouch && ev.type !== 'touchmove') {
-		return;
-	}
-	if (!gestureState.numberActiveTouches) {
-		return;
-	}
+	if (isTouch && ev.type !== 'touchmove') return;
+	if (!gestureState.numberActiveTouches) return;
 
 	// ev.timeStamp is not accurate
 	const timeStamp = Date.now();
-	const deltaTime = timeStamp - mostRecentTimeStamp;
+	const deltaTime = timeStamp - lastMoveTimeStamp;
 
-	if (!deltaTime) {
-		return;
-	}
+	if (!deltaTime) return;
 
 	const getTouch = makeGetTouchInfo(ev);
 	const numberActiveTouches = getNumberActiveTouches(ev);
@@ -133,18 +156,14 @@ const handleMove = (ev) => {
 	gestureState.dy = nextDY;
 	gestureState.numberActiveTouches = numberActiveTouches;
 
-	mostRecentTimeStamp = timeStamp;
+	lastMoveTimeStamp = timeStamp;
 
 	const hasGranted = !!grantedNode;
 
-	if (!hasGranted) {
-		grantedNode = setGrantedNodeOnMove(ev);
-		if (grantedNode) {
-			grantedTouchIds.push(ev);
-		}
-	}
+	grantedNode = setGrantedNodeOnMove(ev);
 
 	if (grantedNode) {
+		if (!hasGranted) grantedTouchIds.push(ev);
 		listeners.get(grantedNode).onMove(ev, gestureState);
 	}
 };
@@ -155,12 +174,8 @@ const handleEnd = (ev) => {
 		window.removeEventListener('mouseup', handleEnd, eventOptions);
 	}
 
-	if (isTouch && ev.type !== 'touchend') {
-		return;
-	}
-	if (!gestureState.numberActiveTouches) {
-		return;
-	}
+	if (isTouch && ev.type !== 'touchend') return;
+	if (!gestureState.numberActiveTouches) return;
 
 	let handler;
 	const numberActiveTouches = getNumberActiveTouches(ev);
@@ -199,31 +214,25 @@ const ensureWindowListener = () => {
 
 export default {
 	init() {
-		if (!hasWindowListener) {
-			ensureWindowListener();
-		}
+		if (!hasWindowListener) ensureWindowListener();
 	},
 
-	addListener(domNode, handlers) {
-		if (!domNode || listeners.has(domNode)) {
-			return false;
-		}
-
-		listeners.set(domNode, {
-			capture: false,
-			...handlers,
-		});
-
+	addListener(instance, handlers) {
+		const { dom } = instance;
+		if (!dom || listeners.has(dom)) return false;
+		listeners.set(dom, handlers);
 		return true;
 	},
 
-	removeListener(domNode) {
-		listeners.delete(domNode);
+	removeListener(instance) {
+		listeners.delete(instance.dom);
 	},
 
 	// Useful for testing
 	destroy() {
 		hasWindowListener = false;
+		lastStartTimeStamp = 0;
+		lastMoveTimeStamp = 0;
 		isTouch = false;
 		grantedNode = null;
 		gestureState = { stateID: Math.random() };

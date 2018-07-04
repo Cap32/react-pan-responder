@@ -3,7 +3,7 @@
 import './styles.scss';
 import React, { Component } from 'react';
 import { render } from 'react-dom';
-import PanResponderView from 'index';
+import PanResponder from 'index';
 import { Github, Eye, EyeOff } from 'react-feather';
 import Granim from 'granim';
 import {
@@ -11,7 +11,7 @@ import {
 	AnimatedValue,
 	AnimatedValueXY,
 	timing,
-	Easing
+	Easing,
 } from 'react-web-animated';
 
 const ls = (function () {
@@ -20,13 +20,13 @@ const ls = (function () {
 	const _ls = localStorage || {
 		getItem: noop,
 		setItem: noop,
-		removeItem: noop
+		removeItem: noop,
 	};
 
 	return {
 		has: () => _ls.getItem(_key),
 		check: () => _ls.setItem(_key, 'YES'),
-		uncheck: () => _ls.removeItem(_key)
+		uncheck: () => _ls.removeItem(_key),
 	};
 })();
 
@@ -41,7 +41,7 @@ class Logger extends Component {
 		dy: 0,
 		vx: 0,
 		vy: 0,
-		numberActiveTouches: 0
+		numberActiveTouches: 0,
 	};
 
 	toFixed(state, key) {
@@ -60,7 +60,7 @@ class Logger extends Component {
 		return (
 			<AnimatedDiv className="logger" {...this.props}>
 				<ul>
-					{Object.keys(gestureState).map(prop => (
+					{Object.keys(gestureState).map((prop) => (
 						<li key={prop}>
 							{prop}: {gestureState[prop]}
 						</li>
@@ -72,17 +72,107 @@ class Logger extends Component {
 }
 
 class App extends Component {
+	constructor(props) {
+		super(props);
+
+		const createPanHandlers = (name) => ({
+			onPanResponderGrant: (ev, gestureState) => {
+				console.log(name, 'onPanResponderGrant');
+
+				// if (name !== 'parent') return;
+
+				const { x0, y0 } = gestureState;
+				const { layoutAnim, styleAnim, hintAmin, logger } = this;
+
+				styleAnim.stopAnimation((value) => {
+					styleAnim.setValue(value);
+					timing(styleAnim, {
+						toValue: 1,
+						duration: 100,
+						easing: Easing.in(Easing.ease),
+					}).start();
+				});
+
+				logger.update(gestureState);
+
+				layoutAnim.stopAnimation(() => {
+					layoutAnim.setValue({ x: x0, y: y0 });
+				});
+
+				if (this.shouldShowHint) {
+					this.shouldShowHint = false;
+					timing(hintAmin, { toValue: 0 }).start();
+				}
+			},
+			onPanResponderStart: () => {
+				console.log(name, 'onPanResponderStart');
+			},
+			onPanResponderMove: (ev, gestureState) => {
+				console.log(name, 'onPanResponderMove');
+
+				// if (name !== 'parent') return;
+
+				const { moveX, moveY } = gestureState;
+				const { layoutAnim, logger } = this;
+				layoutAnim.setValue({ x: moveX, y: moveY });
+				logger.update(gestureState);
+			},
+			onPanResponderRelease: (ev, gestureState) => {
+				console.log(name, 'onPanResponderRelease');
+
+				// if (name !== 'parent') return;
+
+				const { styleAnim, logger } = this;
+				logger.update(gestureState);
+				timing(styleAnim, {
+					toValue: 0,
+					duration: 600,
+					easing: Easing.out(Easing.ease),
+				}).start();
+			},
+			onPanResponderEnd: () => {
+				console.log(name, 'onPanResponderEnd');
+			},
+			onStartShouldSetPanResponderCapture: () => {
+				console.log(name, 'onStartShouldSetPanResponderCapture');
+			},
+			onStartShouldSetPanResponder: () => {
+				console.log(name, 'onStartShouldSetPanResponder');
+			},
+			onMoveShouldSetPanResponderCapture: () => {
+				console.log(name, 'onMoveShouldSetPanResponderCapture');
+			},
+			onMoveShouldSetPanResponder: () => {
+				console.log(name, 'onMoveShouldSetPanResponder');
+				return true;
+				// return name === 'parent';
+			},
+			onPanResponderTerminationRequest: () => {
+				console.log(name, 'onPanResponderTerminationRequest');
+			},
+			onPanResponderTerminate: () => {
+				console.log(name, 'onPanResponderTerminate');
+			},
+			onPanResponderReject: () => {
+				console.log(name, 'onPanResponderReject');
+			},
+		});
+
+		this.parentPanHandlers = createPanHandlers('parent');
+		this.childPanHandlers = createPanHandlers('child');
+	}
+
 	componentDidMount() {
 		// eslint-disable-next-line no-new
 		new Granim({
-			element: '.pan-view',
+			element: '.gradient',
 			opacity: [1, 1],
 			states: {
 				'default-state': {
 					gradients: [['#834D9B', '#D04ED6'], ['#2AFADF', '#4C83FF']],
-					transitionSpeed: 20000
-				}
-			}
+					transitionSpeed: 20000,
+				},
+			},
 		});
 	}
 
@@ -100,88 +190,22 @@ class App extends Component {
 
 	shouldShowHint = true;
 
-	_toggleLoggerSwitch = ev => {
+	_toggleLoggerSwitch = (ev) => {
 		const { checked } = ev.currentTarget;
 		const toValue = checked ? 1 : 0;
 		ls[checked ? 'check' : 'uncheck']();
 		timing(this.loggerAnim, { toValue }).start();
 	};
 
-	_handleShouldStartCapture = () => {
-		console.log('onStartShouldSetPanResponderCapture');
-		return false;
-	};
-
-	_handleShouldStart = () => {
-		console.log('onStartShouldSetPanResponder');
-		return false;
-	};
-
-	_handleShouldMoveCapture = () => {
-		console.log('onMoveShouldSetPanResponderCapture');
-		return false;
-	};
-
-	_handleShouldMove = () => {
-		console.log('onMoveShouldSetPanResponder');
-		return true;
-	};
-
-	_handleGrant = (ev, gestureState) => {
-		console.log('onPanResponderGrant');
-		const { x0, y0 } = gestureState;
-		const { layoutAnim, styleAnim, hintAmin, logger } = this;
-
-		styleAnim.stopAnimation(value => {
-			styleAnim.setValue(value);
-			timing(styleAnim, {
-				toValue: 1,
-				duration: 100,
-				easing: Easing.in(Easing.ease)
-			}).start();
-		});
-
-		logger.update(gestureState);
-
-		layoutAnim.stopAnimation(() => {
-			layoutAnim.setValue({ x: x0, y: y0 });
-		});
-
-		if (this.shouldShowHint) {
-			this.shouldShowHint = false;
-			timing(hintAmin, { toValue: 0 }).start();
-		}
-	};
-
-	_handleStart = () => {
-		console.log('onPanResponderStart');
-	};
-
-	_handleMove = (ev, gestureState) => {
-		console.log('onPanResponderMove');
-		const { moveX, moveY } = gestureState;
-		const { layoutAnim, logger } = this;
-		layoutAnim.setValue({ x: moveX, y: moveY });
-		logger.update(gestureState);
-	};
-
-	_handleEnd = () => {
-		console.log('onPanResponderEnd');
-	};
-
-	_handleRelease = (ev, gestureState) => {
-		console.log('onPanResponderRelease');
-		const { styleAnim, logger } = this;
-		logger.update(gestureState);
-		timing(styleAnim, {
-			toValue: 0,
-			duration: 600,
-			easing: Easing.out(Easing.ease)
-		}).start();
-	};
-
 	render() {
-		const { styleAnim, layoutAnim, loggerAnim, hintAmin } = this;
+		const {
+			styleAnim,
+			layoutAnim,
+			loggerAnim,
+			hintAmin,
+			parentPanHandlers,
+			childPanHandlers,
+		} = this;
 
 		return (
 			<div className="container">
@@ -192,19 +216,19 @@ class App extends Component {
 					</h2>
 				</article>
 
-				<PanResponderView
-					className="pan-view"
-					component="canvas"
-					onPanResponderGrant={this._handleGrant}
-					onPanResponderStart={this._handleStart}
-					onPanResponderMove={this._handleMove}
-					onPanResponderRelease={this._handleRelease}
-					onPanResponderEnd={this._handleEnd}
-					onStartShouldSetPanResponderCapture={this._handleShouldStartCapture}
-					onStartShouldSetPanResponder={this._handleShouldStart}
-					onMoveShouldSetPanResponderCapture={this._handleShouldMoveCapture}
-					onMoveShouldSetPanResponder={this._handleShouldMove}
-				/>
+				<canvas className="gradient" />
+
+				<PanResponder {...parentPanHandlers}>
+					{(ref) => (
+						<div ref={ref} className="pan-view">
+							<PanResponder {...childPanHandlers}>
+								{(childRef) => (
+									<div ref={childRef} className="child-pan-view" />
+								)}
+							</PanResponder>
+						</div>
+					)}
+				</PanResponder>
 
 				<AnimatedDiv className="touch-hint" style={{ opacity: hintAmin }}>
 					Pan to Start
@@ -219,15 +243,15 @@ class App extends Component {
 							{
 								scale: styleAnim.interpolate({
 									inputRange: [0, 1],
-									outputRange: [2, 1]
-								})
-							}
-						]
+									outputRange: [2, 1],
+								}),
+							},
+						],
 					}}
 				/>
 
 				<Logger
-					ref={logger => (this.logger = logger)}
+					ref={(logger) => (this.logger = logger)}
 					style={{ opacity: loggerAnim }}
 				/>
 

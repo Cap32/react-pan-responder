@@ -6,22 +6,21 @@ export function isFunction(target) {
 
 export function noop() {}
 
+export function includes(arr, item) {
+	return ~arr.indexOf(item);
+}
+
 export const supportPassive = passiveEvents.hasSupport;
 
 export function createEventOptions(
-	capture = false,
-	passive = false, // maybe, we should able to use `passive = true` sometimes
+	passive = false, // maybe, we should use `passive = true` sometimes
 ) {
-	if (!supportPassive) {
-		return capture;
-	}
-	return { capture, passive };
+	if (!supportPassive) return true;
+	return { capture: true, passive };
 }
 
-export function getElementPath(event) {
-	if (event.path) {
-		return event.path;
-	}
+export function getEventNodes(event) {
+	if (event.path) return event.path;
 
 	const pathArr = [];
 	let el = event.target;

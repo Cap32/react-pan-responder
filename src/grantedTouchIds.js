@@ -27,13 +27,8 @@ export default {
 	},
 	getTouch(ev) {
 		const { touches } = ev;
-		if (!touches) {
-			return ev;
-		}
-		if (!list.length) {
-			return ev.touches[0];
-		}
-
+		if (!touches) return ev;
+		if (!list.length) return ev.touches[0];
 		const { length } = touches;
 		for (let i = 0; i < length; i++) {
 			const current = touches[i];
