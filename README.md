@@ -6,36 +6,34 @@ Low level pan gesture responder React component for DOM. This library is highly 
 
 ## Table of Contents
 
-<!-- MarkdownTOC autolink="true" bracket="round" -->
-
+- [Table of Contents](#table-of-contents)
 - [Features](#features)
 - [Getting Started](#getting-started)
-    - [Installation](#installation)
-    - [Example](#example)
-    - [Demo](#demo)
+  - [Installation](#installation)
+  - [Example](#example)
+  - [Demo](#demo)
 - [Responder Lifecycle](#responder-lifecycle)
 - [Responder Handlers](#responder-handlers)
-    - [Event](#event)
-    - [GestureState](#gesturestate)
+  - [Event](#event)
+  - [GestureState](#gesturestate)
 - [Properties](#properties)
-    - [component](#component)
-    - [onStartShouldSetPanResponder](#onstartshouldsetpanresponder)
-    - [onStartShouldSetPanResponderCapture](#onstartshouldsetpanrespondercapture)
-    - [onMoveShouldSetPanResponder](#onmoveshouldsetpanresponder)
-    - [onMoveShouldSetPanResponderCapture](#onmoveshouldsetpanrespondercapture)
-    - [onPanResponderGrant](#onpanrespondergrant)
-    - [onPanResponderStart](#onpanresponderstart)
-    - [onPanResponderMove](#onpanrespondermove)
-    - [onPanResponderEnd](#onpanresponderend)
-    - [onPanResponderRelease](#onpanresponderrelease)
-    - [touchAction](#touchaction)
-    - [static TouchActions](#static-touchactions)
+  - [onStartShouldSetPanResponder](#onstartshouldsetpanresponder)
+  - [onStartShouldSetPanResponderCapture](#onstartshouldsetpanrespondercapture)
+  - [onMoveShouldSetPanResponder](#onmoveshouldsetpanresponder)
+  - [onMoveShouldSetPanResponderCapture](#onmoveshouldsetpanrespondercapture)
+  - [onPanResponderGrant](#onpanrespondergrant)
+  - [onPanResponderReject](#onpanresponderreject)
+  - [onPanResponderStart](#onpanresponderstart)
+  - [onPanResponderMove](#onpanrespondermove)
+  - [onPanResponderEnd](#onpanresponderend)
+  - [onPanResponderRelease](#onpanresponderrelease)
+  - [onResponderTerminationRequest](#onresponderterminationrequest)
+  - [onResponderTerminate](#onresponderterminate)
+  - [touchAction](#touchaction)
+  - [static TouchActions](#static-touchactions)
 - [License](#license)
 
-<!-- /MarkdownTOC -->
 
-
-<a name="features"></a>
 ## Features
 
 - Provides `gestureState` helper object
@@ -44,10 +42,8 @@ Low level pan gesture responder React component for DOM. This library is highly 
 - Compatible with mouse event
 
 
-<a name="getting-started"></a>
 ## Getting Started
 
-<a name="installation"></a>
 ### Installation
 
 ```bash
@@ -55,7 +51,6 @@ $ yarn add react-pan-responder-view
 ```
 
 
-<a name="example"></a>
 ### Example
 
 ```js
@@ -70,19 +65,19 @@ export default class MyApp extends Component {
       onPanResponderMove={(event, gestureState) => {}}
       onPanResponderRelease={(event, gestureState) => {}}
     >
-      Awesome
+      {(ref) =>
+        <div ref={ref}>Awesome</div>
+      }
     </PanResponderView>
   }
 }
 ```
 
-<a name="demo"></a>
 ### Demo
 
 [https://cap32.github.io/react-pan-responder-view/](https://cap32.github.io/react-pan-responder-view/)
 
 
-<a name="responder-lifecycle"></a>
 ## Responder Lifecycle
 
 A view can become the touch responder by implementing the correct negotiation methods. There are two methods to ask the view if it wants to become responder:
@@ -93,14 +88,16 @@ A view can become the touch responder by implementing the correct negotiation me
 If the View returns true and attempts to become the responder, one of the following will happen:
 
 * `View.props.onResponderGrant: (event, gestureState) => {}` - The View is now responding for touch events. This is the time to highlight and show the user what is happening
+* `View.props.onResponderReject: (event, gestureState) => {}`  - Something else is the responder right now and will not release it
 
 If the view is responding, the following handlers can be called:
 
 * `View.props.onResponderMove: (event, gestureState) => {}` - The user is moving their finger
 * `View.props.onResponderRelease: (event, gestureState) => {}` - Fired at the end of the touch, i.e. "touchUp"
+* `View.props.onResponderTerminationRequest: (event, gestureState) => true` - Something else wants to become responder. Should this view release the responder? Returning `true` allows release
+* `View.props.onResponderTerminate: (event, gestureState) => {}` - The responder has been taken by other views after a call to `onResponderTerminationRequest`
 
 
-<a name="responder-handlers"></a>
 ## Responder Handlers
 
 It provides a predictable wrapper of the responder handlers provided by the gesture responder system. For each handler, it provides a new `gestureState` object alongside the native event object:
@@ -109,12 +106,10 @@ It provides a predictable wrapper of the responder handlers provided by the gest
 onPanResponderMove: (event, gestureState) => {}
 ```
 
-<a name="event"></a>
 ### Event
 
 The native event that binding to `window` object. **This is NOT a [Synthetic Event](https://facebook.github.io/react/docs/events.html)**
 
-<a name="gesturestate"></a>
 ### GestureState
 
 A gestureState object has the following:
@@ -131,20 +126,10 @@ A gestureState object has the following:
 * numberActiveTouches - Number of touches currently on screen
 
 
-<a name="properties"></a>
 ## Properties
 
 *All properties are optional*
 
-<a name="component"></a>
-### component
-
-`string|function`
-
-Wrapper component. Defaults to `div`.
-
-
-<a name="onstartshouldsetpanresponder"></a>
 ### onStartShouldSetPanResponder
 
 `boolean|function`
@@ -152,7 +137,6 @@ Wrapper component. Defaults to `div`.
 Deciding this component to become responder on the start of a touch. Defaults to `false`. If giving a function, it should return a `boolean`.
 
 
-<a name="onstartshouldsetpanrespondercapture"></a>
 ### onStartShouldSetPanResponderCapture
 
 `boolean|function`
@@ -160,7 +144,6 @@ Deciding this component to become responder on the start of a touch. Defaults to
 Just like `onStartShouldSetPanResponder`, but using capture. Defaults to `false`.
 
 
-<a name="onmoveshouldsetpanresponder"></a>
 ### onMoveShouldSetPanResponder
 
 `boolean|function`
@@ -168,7 +151,6 @@ Just like `onStartShouldSetPanResponder`, but using capture. Defaults to `false`
 Deciding this component to become responder on every touch move on the View when it is not the responder. Defaults to `false`.
 
 
-<a name="onmoveshouldsetpanrespondercapture"></a>
 ### onMoveShouldSetPanResponderCapture
 
 `boolean|function`
@@ -176,47 +158,58 @@ Deciding this component to become responder on every touch move on the View when
 Just like `onMoveShouldSetPanResponder`, but using capture. Defaults to `false`.
 
 
-<a name="onpanrespondergrant"></a>
 ### onPanResponderGrant
 
 `function`
 
-Calling when this component is now responding for touch events. This is the time to highlight and show the user what is happening.
+Fired when this component is now responding for touch events. This is the time to highlight and show the user what is happening.
+
+### onPanResponderReject
+
+`function`
+
+Fired when something else is the responder right now and will not release it
 
 
-<a name="onpanresponderstart"></a>
 ### onPanResponderStart
 
 `function`
 
-Calling for every touch start when it is the responder.
+Fired for every touch start when it is the responder.
 
 
-<a name="onpanrespondermove"></a>
 ### onPanResponderMove
 
 `function`
 
-Calling for every touch move when it is the responder.
+Fired for every touch move when it is the responder.
 
 
-<a name="onpanresponderend"></a>
 ### onPanResponderEnd
 
 `function`
 
-Calling for every touch end when it is the responder.
+Fired for every touch end when it is the responder.
 
 
-<a name="onpanresponderrelease"></a>
 ### onPanResponderRelease
 
 `function`
 
-Calling at the end of the touch, i.e. "touchUp".
+Fired at the end of the touch, i.e. "touchUp".
 
+### onResponderTerminationRequest
 
-<a name="touchaction"></a>
+`boolean|function`
+
+Fired when something else wants to become responder. Should this view release the responder? Returning `true` allows release
+
+### onResponderTerminate
+
+`function`
+
+Fired when responder has been taken by other views after a call to `onResponderTerminationRequest`
+
 ### touchAction
 
 `string`
@@ -224,17 +217,15 @@ Calling at the end of the touch, i.e. "touchUp".
 Defining responder panning action. The value could be one of `TouchActions.none` (default), `TouchActions.x` or `TouchActions.y`. See the following for detail.
 
 
-<a name="static-touchactions"></a>
 ### static TouchActions
 
 An helper object for `touchAction`:
 
 - `none`: Disable browser handling of all panning gestures.
-- `x`: Enable single-finger horizontal panning gestures.
-- `y`: Enable single-finger vertical panning gestures.
+- `x`: Enable single-finger horizontal panning gestures for browser handling.
+- `y`: Enable single-finger vertical panning gestures for browser handling.
 
 
-<a name="license"></a>
 ## License
 
 MIT
