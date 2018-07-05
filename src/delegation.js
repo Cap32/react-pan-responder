@@ -1,5 +1,5 @@
 import grantedTouchIds from './grantedTouchIds';
-import { createEventOptions, getEventNodes, includes } from './utils';
+import { createEventOptions, getEventNodes, includes, noop } from './utils';
 import WeakMap from './WeakMapPolyfill';
 
 const eventOptions = createEventOptions();
@@ -210,10 +210,9 @@ const ensureWindowListener = () => {
 };
 
 export default {
-	addListener(instance, handlers) {
+	addListener(dom, handlers) {
 		if (!hasWindowListener) ensureWindowListener();
-		const { dom } = instance;
-		if (!dom || listeners.has(dom)) return () => {};
+		if (!dom || listeners.has(dom)) return noop;
 		listeners.set(dom, handlers);
 		return () => listeners.delete(dom);
 	},

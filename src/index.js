@@ -1,5 +1,3 @@
-/* eslint react/no-find-dom-node: 0 */
-
 import { Component } from 'react';
 import PropTypes from 'prop-types';
 import TouchActions from './TouchActions';
@@ -55,7 +53,7 @@ export default class PanResponderView extends Component {
 	getDOMNodeByRef = (dom) => (this.dom = dom);
 
 	componentDidMount() {
-		this._removeListener = delegation.addListener(this, {
+		this._handlers = {
 			onShouldStartCapture: this._handleShouldStartCapture,
 			onShouldStart: this._handleShouldStart,
 			onShouldMoveCapture: this._handleShouldMoveCapture,
@@ -68,12 +66,21 @@ export default class PanResponderView extends Component {
 			onEnd: this._handleEnd,
 			onRequestTerminate: this._handleRequestTerminate,
 			onTerminate: this._handleTerminate,
-		});
+		};
+		this._removeListener = delegation.addListener(this.dom, this._handlers);
 	}
 
 	componentWillUnmount() {
 		this._removeListener();
 	}
+
+	getDOMNodeByRef = (dom) => {
+		if (this.dom && dom && this.dom !== dom) {
+			this._removeListener();
+			this._removeListener = delegation.addListener(dom, this._handlers);
+		}
+		this.dom = dom;
+	};
 
 	_handleShouldStartCapture = (...args) => {
 		const { onStartShouldSetPanResponderCapture: should } = this.props;
