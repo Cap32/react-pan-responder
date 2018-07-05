@@ -1,6 +1,6 @@
 /* eslint react/no-find-dom-node: 0 */
 
-import { Component, Children } from 'react';
+import { Component } from 'react';
 import PropTypes from 'prop-types';
 import TouchActions from './TouchActions';
 import delegation from './delegation';
@@ -137,6 +137,6 @@ export default class PanResponderView extends Component {
 	};
 
 	render() {
-		return Children.only(this.props.children(this.getDOMNodeByRef));
+		return this.props.children(this.getDOMNodeByRef);
 	}
 }
