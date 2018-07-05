@@ -50,8 +50,6 @@ export default class PanResponderView extends Component {
 
 	_locking = null;
 
-	getDOMNodeByRef = (dom) => (this.dom = dom);
-
 	componentDidMount() {
 		this._handlers = {
 			onShouldStartCapture: this._handleShouldStartCapture,
