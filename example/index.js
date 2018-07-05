@@ -138,6 +138,8 @@ class App extends Component {
 			},
 			onStartShouldSetPanResponder: () => {
 				console.log(name, 'onStartShouldSetPanResponder');
+				// return true;
+				// return name === 'middle';
 			},
 			onMoveShouldSetPanResponderCapture: () => {
 				console.log(name, 'onMoveShouldSetPanResponderCapture');
@@ -159,6 +161,7 @@ class App extends Component {
 		});
 
 		this.parentPanHandlers = createPanHandlers('parent');
+		this.middlePanHandlers = createPanHandlers('middle');
 		this.childPanHandlers = createPanHandlers('child');
 	}
 
@@ -204,6 +207,7 @@ class App extends Component {
 			loggerAnim,
 			hintAmin,
 			parentPanHandlers,
+			middlePanHandlers,
 			childPanHandlers,
 		} = this;
 
@@ -219,11 +223,39 @@ class App extends Component {
 				<canvas className="gradient" />
 
 				<PanResponder {...parentPanHandlers}>
-					{(ref) => (
-						<div ref={ref} className="pan-view">
-							<PanResponder {...childPanHandlers}>
-								{(childRef) => (
-									<div ref={childRef} className="child-pan-view" />
+					{(parentRef) => (
+						<div ref={parentRef} className="parent-pan-view">
+							<PanResponder {...middlePanHandlers} touchAction="y">
+								{(ref) => (
+									<div ref={ref} className="pan-view">
+										<p>list</p>
+										<p>list</p>
+										<p>list</p>
+										<p>list</p>
+										<p>list</p>
+										<p>list</p>
+										<p>list</p>
+										<p>list</p>
+										<p>list</p>
+										<p>list</p>
+										<p>list</p>
+										<PanResponder {...childPanHandlers}>
+											{(childRef) => (
+												<div ref={childRef} className="child-pan-view" />
+											)}
+										</PanResponder>
+										<p>list</p>
+										<p>list</p>
+										<p>list</p>
+										<p>list</p>
+										<p>list</p>
+										<p>list</p>
+										<p>list</p>
+										<p>list</p>
+										<p>list</p>
+										<p>list</p>
+										<p>list</p>
+									</div>
 								)}
 							</PanResponder>
 						</div>

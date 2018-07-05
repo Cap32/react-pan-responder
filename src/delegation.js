@@ -52,9 +52,8 @@ const makeSetGrantedNode = (action) => (ev) => {
 	findAndExec(nodes.reverse(), `onShould${action}`);
 
 	if (tempGrantedNodes.length) {
-		const grantedHandler = listeners.get(grantedNode);
-
 		tempGrantedNodes.forEach((node) => {
+			const grantedHandler = listeners.get(grantedNode);
 			const handler = listeners.get(node);
 			const shouldTerminate = grantedHandler.onRequestTerminate(
 				ev,
@@ -62,6 +61,7 @@ const makeSetGrantedNode = (action) => (ev) => {
 			);
 			if (shouldTerminate) {
 				grantedHandler.onTerminate(ev, gestureState);
+				grantedNode = node;
 			}
 			else {
 				handler.onReject(ev, gestureState);
@@ -142,6 +142,7 @@ const handleMove = (ev) => {
 
 	const getTouch = makeGetTouchInfo(ev);
 	const numberActiveTouches = getNumberActiveTouches(ev);
+
 	const { x0, y0 } = gestureState;
 	const moveX = getTouch('pageX');
 	const moveY = getTouch('pageY');
@@ -194,12 +195,8 @@ const handleEnd = (ev) => {
 	if (!grantedTouchIds.getCount()) {
 		grantedNode = null;
 		handler && handler.onRelease(ev, gestureState);
-		setTimeout(() => {
-			gestureState = {
-				...gestureState,
-				...getDefaultGestureState(),
-			};
-		}, 0);
+
+		gestureState = { ...gestureState, ...getDefaultGestureState() };
 	}
 };
 
@@ -213,19 +210,12 @@ const ensureWindowListener = () => {
 };
 
 export default {
-	init() {
-		if (!hasWindowListener) ensureWindowListener();
-	},
-
 	addListener(instance, handlers) {
+		if (!hasWindowListener) ensureWindowListener();
 		const { dom } = instance;
-		if (!dom || listeners.has(dom)) return false;
+		if (!dom || listeners.has(dom)) return () => {};
 		listeners.set(dom, handlers);
-		return true;
-	},
-
-	removeListener(instance) {
-		listeners.delete(instance.dom);
+		return () => listeners.delete(dom);
 	},
 
 	// Useful for testing

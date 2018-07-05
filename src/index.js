@@ -8,11 +8,16 @@ import { isFunction, noop } from './utils';
 
 const funcOrBool = PropTypes.oneOfType([PropTypes.func, PropTypes.bool]);
 
+const TouchActionTypes = Object.keys(TouchActions);
+const TouchActionNames = TouchActionTypes.reduce((actions, key) => {
+	actions[key] = key;
+	return actions;
+}, {});
+
 export default class PanResponderView extends Component {
 	static propTypes = {
 		children: PropTypes.func.isRequired,
-		touchAction: PropTypes.oneOf(Object.keys(TouchActions)),
-
+		touchAction: PropTypes.oneOf(TouchActionTypes),
 		onStartShouldSetPanResponderCapture: funcOrBool,
 		onStartShouldSetPanResponder: funcOrBool,
 		onMoveShouldSetPanResponderCapture: funcOrBool,
@@ -40,22 +45,17 @@ export default class PanResponderView extends Component {
 		onMoveShouldSetPanResponderCapture: false,
 		onMoveShouldSetPanResponder: false,
 		onPanResponderTerminationRequest: false,
-		touchAction: TouchActions.none,
+		touchAction: TouchActionNames.none,
 	};
 
-	static TouchActions = TouchActions;
+	static TouchActions = TouchActionNames;
 
 	_locking = null;
 
 	getDOMNodeByRef = (dom) => (this.dom = dom);
 
-	constructor(props) {
-		super(props);
-		delegation.init();
-	}
-
 	componentDidMount() {
-		delegation.addListener(this, {
+		this._removeListener = delegation.addListener(this, {
 			onShouldStartCapture: this._handleShouldStartCapture,
 			onShouldStart: this._handleShouldStart,
 			onShouldMoveCapture: this._handleShouldMoveCapture,
@@ -72,7 +72,7 @@ export default class PanResponderView extends Component {
 	}
 
 	componentWillUnmount() {
-		delegation.removeListener(this);
+		this._removeListener();
 	}
 
 	_handleShouldStartCapture = (...args) => {
@@ -106,20 +106,11 @@ export default class PanResponderView extends Component {
 
 	_handleMove = (ev, gestureState) => {
 		const { onPanResponderMove, touchAction } = this.props;
-
-		if (touchAction !== TouchActions.none) {
-			if (!this._locking) {
-				const absDX = Math.abs(gestureState.dx);
-				const absDY = Math.abs(gestureState.dy);
-				this._locking = absDX > absDY ? TouchActions.x : TouchActions.y;
-			}
-
-			if (this._locking !== touchAction) {
-				return;
-			}
+		if (this._locking === null) {
+			this._locking = TouchActions[touchAction](gestureState);
 		}
-
-		ev.preventDefault();
+		if (this._locking) return;
+		ev.cancelable !== false && ev.preventDefault();
 		onPanResponderMove(ev, gestureState);
 	};
 
