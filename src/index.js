@@ -12,10 +12,11 @@ const TouchActionNames = TouchActionTypes.reduce((actions, key) => {
 	return actions;
 }, {});
 
-export default class PanResponderView extends Component {
+export default class PanResponder extends Component {
 	static propTypes = {
 		children: PropTypes.func.isRequired,
 		touchAction: PropTypes.oneOf(TouchActionTypes),
+		innerRef: PropTypes.func,
 		onStartShouldSetPanResponderCapture: funcOrBool,
 		onStartShouldSetPanResponder: funcOrBool,
 		onMoveShouldSetPanResponderCapture: funcOrBool,
@@ -73,11 +74,13 @@ export default class PanResponderView extends Component {
 	}
 
 	getDOMNodeByRef = (dom) => {
+		const { innerRef } = this.props;
 		if (this.dom && dom && this.dom !== dom) {
 			this._removeListener();
 			this._removeListener = delegation.addListener(dom, this._handlers);
 		}
 		this.dom = dom;
+		if (isFunction(innerRef)) innerRef(dom);
 	};
 
 	_handleShouldStartCapture = (...args) => {
