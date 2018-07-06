@@ -6,13 +6,8 @@ import { render } from 'react-dom';
 import PanResponder from 'index';
 import { Github, Eye, EyeOff } from 'react-feather';
 import Granim from 'granim';
-import {
-	AnimatedDiv,
-	AnimatedValue,
-	AnimatedValueXY,
-	timing,
-	Easing,
-} from 'react-web-animated';
+import Animated from 'animated/lib/targets/react-dom';
+import Easing from 'animated/lib/Easing';
 
 const ls = (function () {
 	const noop = () => {};
@@ -58,7 +53,7 @@ class Logger extends Component {
 	render() {
 		const { gestureState } = this;
 		return (
-			<AnimatedDiv className="logger" {...this.props}>
+			<Animated.div className="logger" {...this.props}>
 				<ul>
 					{Object.keys(gestureState).map((prop) => (
 						<li key={prop}>
@@ -66,7 +61,7 @@ class Logger extends Component {
 						</li>
 					))}
 				</ul>
-			</AnimatedDiv>
+			</Animated.div>
 		);
 	}
 }
@@ -86,7 +81,7 @@ class App extends Component {
 
 				styleAnim.stopAnimation((value) => {
 					styleAnim.setValue(value);
-					timing(styleAnim, {
+					Animated.timing(styleAnim, {
 						toValue: 1,
 						duration: 100,
 						easing: Easing.in(Easing.ease),
@@ -101,7 +96,7 @@ class App extends Component {
 
 				if (this.shouldShowHint) {
 					this.shouldShowHint = false;
-					timing(hintAmin, { toValue: 0 }).start();
+					Animated.timing(hintAmin, { toValue: 0 }).start();
 				}
 			},
 			onPanResponderStart: () => {
@@ -124,7 +119,7 @@ class App extends Component {
 
 				const { styleAnim, logger } = this;
 				logger.update(gestureState);
-				timing(styleAnim, {
+				Animated.timing(styleAnim, {
 					toValue: 0,
 					duration: 600,
 					easing: Easing.out(Easing.ease),
@@ -183,13 +178,13 @@ class App extends Component {
 		return false;
 	}
 
-	layoutAnim = new AnimatedValueXY();
+	layoutAnim = new Animated.ValueXY();
 
-	styleAnim = new AnimatedValue(0);
+	styleAnim = new Animated.Value(0);
 
-	hintAmin = new AnimatedValue(1);
+	hintAmin = new Animated.Value(1);
 
-	loggerAnim = new AnimatedValue(ls.has() ? 1 : 0);
+	loggerAnim = new Animated.Value(ls.has() ? 1 : 0);
 
 	shouldShowHint = true;
 
@@ -197,7 +192,7 @@ class App extends Component {
 		const { checked } = ev.currentTarget;
 		const toValue = checked ? 1 : 0;
 		ls[checked ? 'check' : 'uncheck']();
-		timing(this.loggerAnim, { toValue }).start();
+		Animated.timing(this.loggerAnim, { toValue }).start();
 	};
 
 	render() {
@@ -262,11 +257,11 @@ class App extends Component {
 					)}
 				</PanResponder>
 
-				<AnimatedDiv className="touch-hint" style={{ opacity: hintAmin }}>
+				<Animated.div className="touch-hint" style={{ opacity: hintAmin }}>
 					Pan to Start
-				</AnimatedDiv>
+				</Animated.div>
 
-				<AnimatedDiv
+				<Animated.div
 					className="tracker"
 					style={{
 						opacity: styleAnim,
