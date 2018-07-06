@@ -1,5 +1,5 @@
 import delay from 'delay';
-import { getElementPath } from '../src/utils';
+import { getEventNodes } from '../../src/utils';
 
 export default class Simulator {
 	static create(domNode) {
@@ -62,7 +62,6 @@ export default class Simulator {
 
 	_perform(eventType, data) {
 		const event = document.createEvent('MouseEvents');
-
 		event.initMouseEvent(
 			eventType, // type
 			true, // canBubble
@@ -75,19 +74,19 @@ export default class Simulator {
 			data.clientY, // clientY
 			data.pageX, // pageX
 			data.pageY, // pageY
-			false, // ctrlKey
-			false, // altKey
-			false, // shiftKey
-			false, // metaKey
-			0, // button
-			null, // relatedTarget
+			// false, // ctrlKey
+			// false, // altKey
+			// false, // shiftKey
+			// false, // metaKey
+			// 0, // button
+			// null, // relatedTarget
 		);
 
 		if (eventType.startsWith('touch')) {
 			event.touches = this._touches;
 			event.changedTouches = this._changedTouches;
 		}
-		event.path = [...getElementPath({ target: this._domNode }), window].filter(
+		event.path = [...getEventNodes({ target: this._domNode }), window].filter(
 			(d, index, arr) => arr.indexOf(d) === index,
 		);
 
