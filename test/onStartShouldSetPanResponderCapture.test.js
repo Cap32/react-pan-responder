@@ -34,4 +34,25 @@ describe('onStartShouldSetPanResponderCapture', function () {
 		expect(handler).toHaveBeenNthCalledWith(3, 3);
 		expect(handler).toHaveBeenNthCalledWith(4, 4);
 	});
+
+	test('should not fire `onStartShouldSetPanResponder()` if `onStartShouldSetPanResponderCapture()` returns true', async () => {
+		const handler = jest.fn(() => true);
+		const captureHandler = jest.fn(() => true);
+		let childRef;
+		mount(
+			<PanResponder
+				onStartShouldSetPanResponderCapture={captureHandler}
+				onStartShouldSetPanResponder={handler}
+				innerRef={(dom) => (childRef = dom)}
+			>
+				{(ref) => <div ref={ref} />}
+			</PanResponder>,
+		);
+		await Simulator.create(childRef)
+			.touchStart()
+			.touchEnd()
+			.exec();
+		expect(handler).toHaveBeenCalledTimes(0);
+		expect(captureHandler).toHaveBeenCalledTimes(1);
+	});
 });
