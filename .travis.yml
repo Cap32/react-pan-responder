@@ -4,7 +4,7 @@ node_js:
   - "8"
 
 scripts:
-  - yarn test
+  - yarn test --coverage
 
 after_script:
-  - yarn coverage
+  - yarn coveralls
