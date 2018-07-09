@@ -4,7 +4,7 @@ import Simulator from './utils/Simulator';
 import mount from './utils/mount';
 
 describe('onPanResponderMove', function () {
-	test('should start on touch start', async () => {
+	test('should start on touch move', async () => {
 		const handler = jest.fn();
 		const wrapper = mount(
 			<PanResponder onPanResponderMove={handler} onStartShouldSetPanResponder>
@@ -19,7 +19,7 @@ describe('onPanResponderMove', function () {
 		expect(handler).toHaveBeenCalled();
 	});
 
-	test('should move on mouse down', async () => {
+	test('should move on mouse move', async () => {
 		const handler = jest.fn();
 		const wrapper = mount(
 			<PanResponder onPanResponderMove={handler} onStartShouldSetPanResponder>

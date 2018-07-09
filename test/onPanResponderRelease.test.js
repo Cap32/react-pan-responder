@@ -4,7 +4,7 @@ import Simulator from './utils/Simulator';
 import mount from './utils/mount';
 
 describe('onPanResponderRelease', function () {
-	test('should start on touch start', async () => {
+	test('should release on touch end', async () => {
 		const handler = jest.fn();
 		const wrapper = mount(
 			<PanResponder
@@ -21,7 +21,7 @@ describe('onPanResponderRelease', function () {
 		expect(handler).toHaveBeenCalled();
 	});
 
-	test('should start on mouse down', async () => {
+	test('should release on mouse up', async () => {
 		const handler = jest.fn();
 		const wrapper = mount(
 			<PanResponder
