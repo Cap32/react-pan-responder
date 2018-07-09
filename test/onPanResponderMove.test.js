@@ -14,7 +14,6 @@ describe('onPanResponderMove', function () {
 		await Simulator.create(wrapper.find(PanResponder).getDOMNode())
 			.touchStart()
 			.touchMove()
-			.touchEnd()
 			.exec();
 		expect(handler).toHaveBeenCalled();
 	});
@@ -29,7 +28,6 @@ describe('onPanResponderMove', function () {
 		await Simulator.create(wrapper.find(PanResponder).getDOMNode())
 			.mouseDown()
 			.mouseMove()
-			.mouseUp()
 			.exec();
 		expect(handler).toHaveBeenCalled();
 	});
@@ -46,7 +44,6 @@ describe('onPanResponderMove', function () {
 			.touchMove()
 			.touchMove()
 			.touchMove()
-			.touchEnd()
 			.exec();
 		expect(handler).toHaveBeenCalledTimes(3);
 	});

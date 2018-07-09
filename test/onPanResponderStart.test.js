@@ -13,7 +13,6 @@ describe('onPanResponderStart', function () {
 		);
 		await Simulator.create(wrapper.find(PanResponder).getDOMNode())
 			.touchStart()
-			.touchEnd()
 			.exec();
 		expect(handler).toHaveBeenCalled();
 	});
@@ -27,7 +26,6 @@ describe('onPanResponderStart', function () {
 		);
 		await Simulator.create(wrapper.find(PanResponder).getDOMNode())
 			.mouseDown()
-			.mouseUp()
 			.exec();
 		expect(handler).toHaveBeenCalled();
 	});
@@ -42,8 +40,6 @@ describe('onPanResponderStart', function () {
 		await Simulator.create(wrapper.find(PanResponder).getDOMNode())
 			.touchStart({}, 1)
 			.touchStart({}, 2)
-			.touchEnd({}, 1)
-			.touchEnd({}, 2)
 			.exec();
 		expect(handler).toHaveBeenCalledTimes(2);
 	});
