@@ -1,6 +1,6 @@
-import WeakMapPolyfill from '../src/WeakMapPolyfill';
-
 let nativeWeakMap;
+
+const getWeakMapPolyfill = () => require('../src/WeakMapPolyfill').default;
 
 beforeAll(() => {
 	nativeWeakMap = global.WeakMap;
@@ -13,6 +13,7 @@ afterAll(() => {
 
 describe('WeakMapPolyfill', function () {
 	test('should `WeakMapPolyfill` work', () => {
+		const WeakMapPolyfill = getWeakMapPolyfill();
 		const weakMap = new WeakMapPolyfill();
 		const obj = {};
 		const val = 'it works';
@@ -25,5 +26,6 @@ describe('WeakMapPolyfill', function () {
 		weakMap.delete(obj);
 		expect(weakMap.has(obj)).toBe(false);
 		expect(weakMap.get(obj)).toBe(undefined);
+		expect(weakMap.delete(obj)).toBe(false);
 	});
 });

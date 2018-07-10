@@ -25,9 +25,7 @@ export default (supportWeakMap ?
 			}
 
 			delete(object) {
-				if (!this.has(object)) {
-					return false;
-				}
+				if (!this.has(object)) return false;
 				delete this._maps[object[$id]];
 				return true;
 			}
