@@ -75,10 +75,6 @@ export default class PanResponder extends Component {
 
 	getDOMNodeByRef = (dom) => {
 		const { innerRef } = this.props;
-		if (this.dom && dom && this.dom !== dom) {
-			this._removeListener();
-			this._removeListener = delegation.addListener(dom, this._handlers);
-		}
 		this.dom = dom;
 		if (isFunction(innerRef)) innerRef(dom);
 	};

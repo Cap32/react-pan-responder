@@ -8,6 +8,7 @@ export default {
 		list.push(getChangedTouchId(ev));
 	},
 	pull(ev) {
+		/* istanbul ignore next */
 		if (ev.touches && !ev.touches.length) {
 			this.clear();
 			return;
@@ -15,9 +16,9 @@ export default {
 
 		const touchId = getChangedTouchId(ev);
 		const index = list.indexOf(touchId);
-		if (index > -1) {
-			list.splice(index, 1);
-		}
+
+		/* istanbul ignore else */
+		if (index > -1) list.splice(index, 1);
 	},
 	clear() {
 		list.length = 0;
@@ -32,9 +33,9 @@ export default {
 		const { length } = touches;
 		for (let i = 0; i < length; i++) {
 			const current = touches[i];
-			if (current && current.identifier === list[0]) {
-				return current;
-			}
+
+			/* istanbul ignore else */
+			if (current && current.identifier === list[0]) return current;
 		}
 	},
 };

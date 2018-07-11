@@ -15,7 +15,9 @@ export const supportPassive = passiveEvents.hasSupport;
 export function createEventOptions(
 	passive = false, // maybe, we should use `passive = true` sometimes
 ) {
+	/* istanbul ignore else */
 	if (!supportPassive) return true;
+	/* istanbul ignore next */
 	return { capture: true, passive };
 }
 

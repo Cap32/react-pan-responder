@@ -32,6 +32,22 @@ describe('onPanResponderEnd', function () {
 		expect(handler).toHaveBeenCalled();
 	});
 
+	test('should end on touch end and mouse end', async () => {
+		const handler = jest.fn();
+		const wrapper = mount(
+			<PanResponder onPanResponderEnd={handler} onStartShouldSetPanResponder>
+				{(ref) => <div ref={ref} />}
+			</PanResponder>,
+		);
+		await Simulator.create(wrapper.find(PanResponder).getDOMNode())
+			.touchStart()
+			.mouseDown()
+			.touchEnd()
+			.mouseUp()
+			.exec();
+		expect(handler).toHaveBeenCalled();
+	});
+
 	test('should end multiple time', async () => {
 		const handler = jest.fn();
 		const wrapper = mount(

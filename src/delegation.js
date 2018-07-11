@@ -37,6 +37,7 @@ const makeSetGrantedNode = (action) => (ev) => {
 			if (grantedNode !== node && listeners.has(node)) {
 				const handler = listeners.get(node);
 				if (handler[methodName](ev, gestureState)) {
+					/* istanbul ignore else */
 					if (!includes(tempGrantedNodes, node)) {
 						if (!grantedNode) grantedNode = node;
 						else tempGrantedNodes.push(node);
@@ -77,7 +78,7 @@ const setGrantedNodeOnMove = makeSetGrantedNode('Move');
 
 const makeGetTouchInfo = (ev) => {
 	const touch = grantedTouchIds.getTouch(ev);
-	return (key) => touch[key];
+	return (key) => (touch ? touch[key] : 0);
 };
 
 const getNumberActiveTouches = (ev) =>
@@ -107,6 +108,7 @@ const handleStart = (ev) => {
 
 		const nodes = getEventNodes(ev);
 
+		/* istanbul ignore else */
 		if (includes(nodes, grantedNode)) {
 			grantedTouchIds.push(ev);
 			listeners.get(grantedNode).onStart(ev, gestureState);
@@ -131,13 +133,17 @@ const handleStart = (ev) => {
 };
 
 const handleMove = (ev) => {
+	/* istanbul ignore if */
 	if (isTouch && ev.type !== 'touchmove') return;
+
+	/* istanbul ignore if */
 	if (!gestureState.numberActiveTouches) return;
 
 	// ev.timeStamp is not accurate
 	const timeStamp = Date.now();
 	const deltaTime = timeStamp - lastMoveTimeStamp;
 
+	/* istanbul ignore if */
 	if (!deltaTime) return;
 
 	const getTouch = makeGetTouchInfo(ev);
@@ -175,6 +181,10 @@ const handleEnd = (ev) => {
 		window.removeEventListener('mouseup', handleEnd, eventOptions);
 	}
 
+	/* istanbul ignore if */
+	if (isTouch && ev.type !== 'touchend' && ev.type !== 'touchcancel') return;
+
+	/* istanbul ignore if */
 	if (!gestureState.numberActiveTouches) return;
 
 	let handler;
