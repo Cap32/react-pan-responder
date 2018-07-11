@@ -1,4 +1,3 @@
-
 const { resolve } = require('path');
 const webpack = require('webpack');
 const { name } = require('./package.json');
@@ -28,11 +27,7 @@ module.exports = (webpackEnv = {}) => {
 					include: [srcDir, testDir, exampleDir],
 					loader: 'babel-loader',
 					options: {
-						presets: [
-							['es2015', { modules: false }],
-							'react',
-							'stage-0',
-						],
+						presets: [['es2015', { modules: false }], 'react', 'stage-0'],
 						cacheDirectory: true,
 						babelrc: false,
 					},
@@ -94,15 +89,13 @@ module.exports = (webpackEnv = {}) => {
 			libraryTarget: 'umd',
 		};
 		config.externals = {
-			'react': 'React',
+			react: 'React',
 			'react-dom': 'ReactDom',
 		};
 	}
 
 	if (minify) {
-		config.plugins.push(
-			new webpack.optimize.UglifyJsPlugin(),
-		);
+		config.plugins.push(new webpack.optimize.UglifyJsPlugin());
 	}
 
 	return config;
