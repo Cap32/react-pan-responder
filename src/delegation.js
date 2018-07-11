@@ -175,22 +175,20 @@ const handleEnd = (ev) => {
 		window.removeEventListener('mouseup', handleEnd, eventOptions);
 	}
 
-	if (isTouch && ev.type !== 'touchend') return;
 	if (!gestureState.numberActiveTouches) return;
 
 	let handler;
+	const isCancel = isTouch && ev.type === 'touchcancel';
 	const numberActiveTouches = getNumberActiveTouches(ev);
 
 	if (grantedNode && listeners.has(grantedNode)) {
 		grantedTouchIds.pull(ev);
 		handler = listeners.get(grantedNode);
 		gestureState.numberActiveTouches = numberActiveTouches;
-		handler.onEnd(ev, gestureState);
+		handler[isCancel ? 'onTerminate' : 'onEnd'](ev, gestureState);
 	}
 
-	if (!numberActiveTouches) {
-		isTouch = false;
-	}
+	if (!numberActiveTouches) isTouch = false;
 
 	if (!grantedTouchIds.getCount()) {
 		grantedNode = null;

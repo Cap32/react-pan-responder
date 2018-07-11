@@ -141,6 +141,16 @@ export default class Simulator {
 		});
 	}
 
+	touchCancel(data, identifier) {
+		return this._push(() => {
+			const touchId = identifier || this._prevTouchIdentifier;
+			const touch = this._createTouch(data, touchId);
+			this._pushTouch(touch);
+			this._perform('touchcancel', touch);
+			this._dropTouch(touch);
+		});
+	}
+
 	async exec() {
 		for (const fn of this._actions) {
 			fn();
