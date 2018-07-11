@@ -2,7 +2,7 @@ import { Component } from 'react';
 import PropTypes from 'prop-types';
 import TouchActions from './TouchActions';
 import delegation from './delegation';
-import { isFunction, noop } from './utils';
+import { isFunction, isObject, noop } from './utils';
 
 const funcOrBool = PropTypes.oneOfType([PropTypes.func, PropTypes.bool]);
 
@@ -16,7 +16,10 @@ export default class PanResponder extends Component {
 	static propTypes = {
 		children: PropTypes.func.isRequired,
 		touchAction: PropTypes.oneOf(TouchActionTypes),
-		innerRef: PropTypes.func,
+		innerRef: PropTypes.oneOfType([
+			PropTypes.func,
+			PropTypes.shape({ current: PropTypes.object }),
+		]),
 		onStartShouldSetPanResponderCapture: funcOrBool,
 		onStartShouldSetPanResponder: funcOrBool,
 		onMoveShouldSetPanResponderCapture: funcOrBool,
@@ -77,6 +80,7 @@ export default class PanResponder extends Component {
 		const { innerRef } = this.props;
 		this.dom = dom;
 		if (isFunction(innerRef)) innerRef(dom);
+		else if (isObject(innerRef)) innerRef.current = dom;
 	};
 
 	_handleShouldStartCapture = (...args) => {
