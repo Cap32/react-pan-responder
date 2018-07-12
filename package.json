@@ -33,6 +33,15 @@
   "main": "lib/index.js",
   "module": "es/index.js",
   "jsnext:main": "es/index.js",
+  "keywords": [
+    "responder",
+    "react",
+    "pan",
+    "gesture",
+    "touch",
+    "mouse",
+    "dom"
+  ],
   "author": "cap32",
   "license": "MIT",
   "peerDependencies": {
