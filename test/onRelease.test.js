@@ -3,11 +3,11 @@ import PanResponder from '../src';
 import Simulator from './utils/Simulator';
 import mount from './utils/mount';
 
-describe('onPanResponderEnd', function () {
-	test('should end on touch end', async () => {
+describe('onRelease', function () {
+	test('should release on touch end', async () => {
 		const handler = jest.fn();
 		const wrapper = mount(
-			<PanResponder onPanResponderEnd={handler} onStartShouldSetPanResponder>
+			<PanResponder onRelease={handler} onStartShouldSet>
 				{(ref) => <div ref={ref} />}
 			</PanResponder>,
 		);
@@ -18,10 +18,10 @@ describe('onPanResponderEnd', function () {
 		expect(handler).toHaveBeenCalled();
 	});
 
-	test('should end on mouse up', async () => {
+	test('should release on mouse up', async () => {
 		const handler = jest.fn();
 		const wrapper = mount(
-			<PanResponder onPanResponderEnd={handler} onStartShouldSetPanResponder>
+			<PanResponder onRelease={handler} onStartShouldSet>
 				{(ref) => <div ref={ref} />}
 			</PanResponder>,
 		);
@@ -32,35 +32,22 @@ describe('onPanResponderEnd', function () {
 		expect(handler).toHaveBeenCalled();
 	});
 
-	test('should end on touch end and mouse end', async () => {
+	test('should release once', async () => {
 		const handler = jest.fn();
 		const wrapper = mount(
-			<PanResponder onPanResponderEnd={handler} onStartShouldSetPanResponder>
-				{(ref) => <div ref={ref} />}
-			</PanResponder>,
-		);
-		await Simulator.create(wrapper.find(PanResponder).getDOMNode())
-			.touchStart()
-			.mouseDown()
-			.touchEnd()
-			.mouseUp()
-			.exec();
-		expect(handler).toHaveBeenCalled();
-	});
-
-	test('should end multiple time', async () => {
-		const handler = jest.fn();
-		const wrapper = mount(
-			<PanResponder onPanResponderEnd={handler} onStartShouldSetPanResponder>
+			<PanResponder onRelease={handler} onStartShouldSet>
 				{(ref) => <div ref={ref} />}
 			</PanResponder>,
 		);
 		await Simulator.create(wrapper.find(PanResponder).getDOMNode())
 			.touchStart({}, 1)
 			.touchStart({}, 2)
+			.touchMove({}, 1)
+			.touchMove({}, 1)
+			.touchMove({}, 2)
 			.touchEnd({}, 1)
 			.touchEnd({}, 2)
 			.exec();
-		expect(handler).toHaveBeenCalledTimes(2);
+		expect(handler).toHaveBeenCalledTimes(1);
 	});
 });

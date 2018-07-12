@@ -3,11 +3,11 @@ import PanResponder from '../src';
 import Simulator from './utils/Simulator';
 import mount from './utils/mount';
 
-describe('onMoveShouldSetPanResponder', function () {
+describe('onMoveShouldSet', function () {
 	test('should not grant on move by default', async () => {
 		const handler = jest.fn();
 		const wrapper = mount(
-			<PanResponder onPanResponderGrant={handler}>
+			<PanResponder onGrant={handler}>
 				{(ref) => <div ref={ref} />}
 			</PanResponder>,
 		);
@@ -19,10 +19,10 @@ describe('onMoveShouldSetPanResponder', function () {
 		expect(handler).not.toHaveBeenCalled();
 	});
 
-	test('should grant if `onMoveShouldSetPanResponder` is true', async () => {
+	test('should grant if `onMoveShouldSet` is true', async () => {
 		const handler = jest.fn();
 		const wrapper = mount(
-			<PanResponder onPanResponderGrant={handler} onMoveShouldSetPanResponder>
+			<PanResponder onGrant={handler} onMoveShouldSet>
 				{(ref) => <div ref={ref} />}
 			</PanResponder>,
 		);
@@ -34,14 +34,11 @@ describe('onMoveShouldSetPanResponder', function () {
 		expect(handler).toHaveBeenCalled();
 	});
 
-	test('should grant if `onMoveShouldSetPanResponder()` function returns true', async () => {
+	test('should grant if `onMoveShouldSet()` function returns true', async () => {
 		const handler = jest.fn();
-		const shouldSetPanResponder = (ev, gestureState) => gestureState.dx > 10;
+		const shouldSet = (ev, gestureState) => gestureState.dx > 10;
 		const wrapper = mount(
-			<PanResponder
-				onPanResponderGrant={handler}
-				onMoveShouldSetPanResponder={shouldSetPanResponder}
-			>
+			<PanResponder onGrant={handler} onMoveShouldSet={shouldSet}>
 				{(ref) => <div ref={ref} />}
 			</PanResponder>,
 		);

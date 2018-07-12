@@ -3,11 +3,11 @@ import PanResponder from '../src';
 import Simulator from './utils/Simulator';
 import mount from './utils/mount';
 
-describe('onPanResponderGrant', function () {
-	test('should grant on touch start', async () => {
+describe('onStart', function () {
+	test('should start on touch start', async () => {
 		const handler = jest.fn();
 		const wrapper = mount(
-			<PanResponder onPanResponderGrant={handler} onStartShouldSetPanResponder>
+			<PanResponder onStart={handler} onStartShouldSet>
 				{(ref) => <div ref={ref} />}
 			</PanResponder>,
 		);
@@ -17,10 +17,10 @@ describe('onPanResponderGrant', function () {
 		expect(handler).toHaveBeenCalled();
 	});
 
-	test('should grant on mouse down', async () => {
+	test('should start on mouse down', async () => {
 		const handler = jest.fn();
 		const wrapper = mount(
-			<PanResponder onPanResponderGrant={handler} onStartShouldSetPanResponder>
+			<PanResponder onStart={handler} onStartShouldSet>
 				{(ref) => <div ref={ref} />}
 			</PanResponder>,
 		);
@@ -30,14 +30,10 @@ describe('onPanResponderGrant', function () {
 		expect(handler).toHaveBeenCalled();
 	});
 
-	test('should grant once', async () => {
+	test('should start multiple time', async () => {
 		const handler = jest.fn();
 		const wrapper = mount(
-			<PanResponder
-				onStartShouldSetPanResponder
-				onMoveShouldSetPanResponder
-				onPanResponderGrant={handler}
-			>
+			<PanResponder onStart={handler} onStartShouldSet>
 				{(ref) => <div ref={ref} />}
 			</PanResponder>,
 		);
@@ -45,6 +41,6 @@ describe('onPanResponderGrant', function () {
 			.touchStart({}, 1)
 			.touchStart({}, 2)
 			.exec();
-		expect(handler).toHaveBeenCalledTimes(1);
+		expect(handler).toHaveBeenCalledTimes(2);
 	});
 });

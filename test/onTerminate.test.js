@@ -3,14 +3,14 @@ import PanResponder from '../src';
 import Simulator from './utils/Simulator';
 import mount from './utils/mount';
 
-describe('onPanResponderTerminationRequest', function () {
-	test('should not fire `onPanResponderTerminationRequest()` by default', async () => {
+describe('onTerminate', function () {
+	test('should not fire `onTerminate()` by default', async () => {
 		const handler = jest.fn();
 		let childRef;
 		mount(
 			<PanResponder
-				onStartShouldSetPanResponder={() => true}
-				onPanResponderTerminationRequest={handler}
+				onStartShouldSet={() => true}
+				onTerminate={handler}
 				innerRef={(dom) => (childRef = dom)}
 			>
 				{(ref) => <div ref={ref} />}
@@ -23,16 +23,17 @@ describe('onPanResponderTerminationRequest', function () {
 		expect(handler).toHaveBeenCalledTimes(0);
 	});
 
-	test('should fire `onPanResponderTerminationRequest()` when parent responder granted', async () => {
+	test('should fire `onTerminate()` when `onTerminationRequest()` returns `true`', async () => {
 		const handler = jest.fn();
 		let childRef;
 		mount(
-			<PanResponder onStartShouldSetPanResponder={() => true}>
+			<PanResponder onStartShouldSet={() => true}>
 				{(ref) => (
 					<div ref={ref}>
 						<PanResponder
-							onStartShouldSetPanResponder={() => true}
-							onPanResponderTerminationRequest={handler}
+							onStartShouldSet={() => true}
+							onTerminationRequest={() => true}
+							onTerminate={handler}
 							innerRef={(dom) => (childRef = dom)}
 						>
 							{(ref) => <div ref={ref} />}
@@ -48,30 +49,21 @@ describe('onPanResponderTerminationRequest', function () {
 		expect(handler).toHaveBeenCalledTimes(1);
 	});
 
-	test('could `onPanResponderTerminationRequest` be boolean', async () => {
+	test('should fire `onTerminate()` when touch canceled', async () => {
 		const handler = jest.fn();
 		let childRef;
 		mount(
 			<PanResponder
-				onStartShouldSetPanResponder={() => true}
-				onPanResponderReject={handler}
+				onStartShouldSet={() => true}
+				onTerminate={handler}
+				innerRef={(dom) => (childRef = dom)}
 			>
-				{(ref) => (
-					<div ref={ref}>
-						<PanResponder
-							onStartShouldSetPanResponder={() => true}
-							onPanResponderTerminationRequest={false}
-							innerRef={(dom) => (childRef = dom)}
-						>
-							{(ref) => <div ref={ref} />}
-						</PanResponder>
-					</div>
-				)}
+				{(ref) => <div ref={ref} />}
 			</PanResponder>,
 		);
 		await Simulator.create(childRef)
 			.touchStart()
-			.touchEnd()
+			.touchCancel()
 			.exec();
 		expect(handler).toHaveBeenCalledTimes(1);
 	});

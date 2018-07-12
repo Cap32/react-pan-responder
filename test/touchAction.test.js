@@ -4,14 +4,10 @@ import Simulator from './utils/Simulator';
 import mount from './utils/mount';
 
 describe('touchAction', function () {
-	test('should fire `onPanResponderMove` if touchAction is "none" and panning horizontally', async () => {
+	test('should fire `onMove` if touchAction is "none" and panning horizontally', async () => {
 		const handler = jest.fn();
 		const wrapper = mount(
-			<PanResponder
-				touchAction="none"
-				onStartShouldSetPanResponder
-				onPanResponderMove={handler}
-			>
+			<PanResponder touchAction="none" onStartShouldSet onMove={handler}>
 				{(ref) => <div ref={ref} />}
 			</PanResponder>,
 		);
@@ -24,14 +20,10 @@ describe('touchAction', function () {
 		expect(handler).toHaveBeenCalledTimes(2);
 	});
 
-	test('should fire `onPanResponderMove` if touchAction is "none" and panning vertically', async () => {
+	test('should fire `onMove` if touchAction is "none" and panning vertically', async () => {
 		const handler = jest.fn();
 		const wrapper = mount(
-			<PanResponder
-				touchAction="none"
-				onStartShouldSetPanResponder
-				onPanResponderMove={handler}
-			>
+			<PanResponder touchAction="none" onStartShouldSet onMove={handler}>
 				{(ref) => <div ref={ref} />}
 			</PanResponder>,
 		);
@@ -44,14 +36,10 @@ describe('touchAction', function () {
 		expect(handler).toHaveBeenCalledTimes(2);
 	});
 
-	test('should fire `onPanResponderMove` if touchAction is "x" and panning horizontally', async () => {
+	test('should fire `onMove` if touchAction is "x" and panning horizontally', async () => {
 		const handler = jest.fn();
 		const wrapper = mount(
-			<PanResponder
-				touchAction="x"
-				onStartShouldSetPanResponder
-				onPanResponderMove={handler}
-			>
+			<PanResponder touchAction="x" onStartShouldSet onMove={handler}>
 				{(ref) => <div ref={ref} />}
 			</PanResponder>,
 		);
@@ -64,14 +52,10 @@ describe('touchAction', function () {
 		expect(handler).toHaveBeenCalledTimes(2);
 	});
 
-	test('should not fire `onPanResponderMove` if touchAction is "x" and panning vertically', async () => {
+	test('should not fire `onMove` if touchAction is "x" and panning vertically', async () => {
 		const handler = jest.fn();
 		const wrapper = mount(
-			<PanResponder
-				touchAction="x"
-				onStartShouldSetPanResponder
-				onPanResponderMove={handler}
-			>
+			<PanResponder touchAction="x" onStartShouldSet onMove={handler}>
 				{(ref) => <div ref={ref} />}
 			</PanResponder>,
 		);
@@ -84,14 +68,10 @@ describe('touchAction', function () {
 		expect(handler).toHaveBeenCalledTimes(0);
 	});
 
-	test('should fire `onPanResponderMove` if touchAction is "y" and panning vertically', async () => {
+	test('should fire `onMove` if touchAction is "y" and panning vertically', async () => {
 		const handler = jest.fn();
 		const wrapper = mount(
-			<PanResponder
-				touchAction="y"
-				onStartShouldSetPanResponder
-				onPanResponderMove={handler}
-			>
+			<PanResponder touchAction="y" onStartShouldSet onMove={handler}>
 				{(ref) => <div ref={ref} />}
 			</PanResponder>,
 		);
@@ -104,14 +84,10 @@ describe('touchAction', function () {
 		expect(handler).toHaveBeenCalledTimes(2);
 	});
 
-	test('should not fire `onPanResponderMove` if touchAction is "y" and panning horizontally', async () => {
+	test('should not fire `onMove` if touchAction is "y" and panning horizontally', async () => {
 		const handler = jest.fn();
 		const wrapper = mount(
-			<PanResponder
-				touchAction="y"
-				onStartShouldSetPanResponder
-				onPanResponderMove={handler}
-			>
+			<PanResponder touchAction="y" onStartShouldSet onMove={handler}>
 				{(ref) => <div ref={ref} />}
 			</PanResponder>,
 		);

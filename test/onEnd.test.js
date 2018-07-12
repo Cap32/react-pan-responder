@@ -3,64 +3,64 @@ import PanResponder from '../src';
 import Simulator from './utils/Simulator';
 import mount from './utils/mount';
 
-describe('onPanResponderMove', function () {
-	test('should start on touch move', async () => {
+describe('onEnd', function () {
+	test('should end on touch end', async () => {
 		const handler = jest.fn();
 		const wrapper = mount(
-			<PanResponder onPanResponderMove={handler} onStartShouldSetPanResponder>
+			<PanResponder onEnd={handler} onStartShouldSet>
 				{(ref) => <div ref={ref} />}
 			</PanResponder>,
 		);
 		await Simulator.create(wrapper.find(PanResponder).getDOMNode())
 			.touchStart()
-			.touchMove()
+			.touchEnd()
 			.exec();
 		expect(handler).toHaveBeenCalled();
 	});
 
-	test('should move on mouse move', async () => {
+	test('should end on mouse up', async () => {
 		const handler = jest.fn();
 		const wrapper = mount(
-			<PanResponder onPanResponderMove={handler} onStartShouldSetPanResponder>
+			<PanResponder onEnd={handler} onStartShouldSet>
 				{(ref) => <div ref={ref} />}
 			</PanResponder>,
 		);
 		await Simulator.create(wrapper.find(PanResponder).getDOMNode())
 			.mouseDown()
-			.mouseMove()
+			.mouseUp()
 			.exec();
 		expect(handler).toHaveBeenCalled();
 	});
 
-	test('should move on touch move and mouse move', async () => {
+	test('should end on touch end and mouse end', async () => {
 		const handler = jest.fn();
 		const wrapper = mount(
-			<PanResponder onPanResponderMove={handler} onStartShouldSetPanResponder>
+			<PanResponder onEnd={handler} onStartShouldSet>
 				{(ref) => <div ref={ref} />}
 			</PanResponder>,
 		);
 		await Simulator.create(wrapper.find(PanResponder).getDOMNode())
 			.touchStart()
 			.mouseDown()
-			.touchMove()
-			.mouseMove()
+			.touchEnd()
+			.mouseUp()
 			.exec();
 		expect(handler).toHaveBeenCalled();
 	});
 
-	test('should move multiple time', async () => {
+	test('should end multiple time', async () => {
 		const handler = jest.fn();
 		const wrapper = mount(
-			<PanResponder onPanResponderMove={handler} onStartShouldSetPanResponder>
+			<PanResponder onEnd={handler} onStartShouldSet>
 				{(ref) => <div ref={ref} />}
 			</PanResponder>,
 		);
 		await Simulator.create(wrapper.find(PanResponder).getDOMNode())
-			.touchStart()
-			.touchMove()
-			.touchMove()
-			.touchMove()
+			.touchStart({}, 1)
+			.touchStart({}, 2)
+			.touchEnd({}, 1)
+			.touchEnd({}, 2)
 			.exec();
-		expect(handler).toHaveBeenCalledTimes(3);
+		expect(handler).toHaveBeenCalledTimes(2);
 	});
 });

@@ -71,8 +71,8 @@ class App extends Component {
 		super(props);
 
 		const createPanHandlers = (name) => ({
-			onPanResponderGrant: (ev, gestureState) => {
-				console.log(name, 'onPanResponderGrant');
+			onGrant: (ev, gestureState) => {
+				console.log(name, 'onGrant');
 
 				// if (name !== 'parent') return;
 
@@ -99,11 +99,11 @@ class App extends Component {
 					Animated.timing(hintAmin, { toValue: 0 }).start();
 				}
 			},
-			onPanResponderStart: () => {
-				console.log(name, 'onPanResponderStart');
+			onStart: () => {
+				console.log(name, 'onStart');
 			},
-			onPanResponderMove: (ev, gestureState) => {
-				console.log(name, 'onPanResponderMove');
+			onMove: (ev, gestureState) => {
+				console.log(name, 'onMove');
 
 				// if (name !== 'parent') return;
 
@@ -112,8 +112,8 @@ class App extends Component {
 				layoutAnim.setValue({ x: moveX, y: moveY });
 				logger.update(gestureState);
 			},
-			onPanResponderRelease: (ev, gestureState) => {
-				console.log(name, 'onPanResponderRelease');
+			onRelease: (ev, gestureState) => {
+				console.log(name, 'onRelease');
 
 				// if (name !== 'parent') return;
 
@@ -125,33 +125,33 @@ class App extends Component {
 					easing: Easing.out(Easing.ease),
 				}).start();
 			},
-			onPanResponderEnd: () => {
-				console.log(name, 'onPanResponderEnd');
+			onEnd: () => {
+				console.log(name, 'onEnd');
 			},
-			onStartShouldSetPanResponderCapture: () => {
-				console.log(name, 'onStartShouldSetPanResponderCapture');
+			onStartShouldSetCapture: () => {
+				console.log(name, 'onStartShouldSetCapture');
 			},
-			onStartShouldSetPanResponder: () => {
-				console.log(name, 'onStartShouldSetPanResponder');
+			onStartShouldSet: () => {
+				console.log(name, 'onStartShouldSet');
 				// return true;
 				// return name === 'middle';
 			},
-			onMoveShouldSetPanResponderCapture: () => {
-				console.log(name, 'onMoveShouldSetPanResponderCapture');
+			onMoveShouldSetCapture: () => {
+				console.log(name, 'onMoveShouldSetCapture');
 			},
-			onMoveShouldSetPanResponder: () => {
-				console.log(name, 'onMoveShouldSetPanResponder');
+			onMoveShouldSet: () => {
+				console.log(name, 'onMoveShouldSet');
 				return true;
 				// return name === 'parent';
 			},
-			onPanResponderTerminationRequest: () => {
-				console.log(name, 'onPanResponderTerminationRequest');
+			onTerminationRequest: () => {
+				console.log(name, 'onTerminationRequest');
 			},
-			onPanResponderTerminate: () => {
-				console.log(name, 'onPanResponderTerminate');
+			onTerminate: () => {
+				console.log(name, 'onTerminate');
 			},
-			onPanResponderReject: () => {
-				console.log(name, 'onPanResponderReject');
+			onReject: () => {
+				console.log(name, 'onReject');
 			},
 		});
 

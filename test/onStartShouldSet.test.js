@@ -3,11 +3,11 @@ import PanResponder from '../src';
 import Simulator from './utils/Simulator';
 import mount from './utils/mount';
 
-describe('onStartShouldSetPanResponder', function () {
+describe('onStartShouldSet', function () {
 	test('should not grant on start by default', async () => {
 		const handler = jest.fn();
 		const wrapper = mount(
-			<PanResponder onPanResponderGrant={handler}>
+			<PanResponder onGrant={handler}>
 				{(ref) => <div ref={ref} />}
 			</PanResponder>,
 		);
@@ -18,10 +18,10 @@ describe('onStartShouldSetPanResponder', function () {
 		expect(handler).not.toHaveBeenCalled();
 	});
 
-	test('should grant if `onStartShouldSetPanResponder` is true', async () => {
+	test('should grant if `onStartShouldSet` is true', async () => {
 		const handler = jest.fn();
 		const wrapper = mount(
-			<PanResponder onPanResponderGrant={handler} onStartShouldSetPanResponder>
+			<PanResponder onGrant={handler} onStartShouldSet>
 				{(ref) => <div ref={ref} />}
 			</PanResponder>,
 		);
@@ -32,14 +32,11 @@ describe('onStartShouldSetPanResponder', function () {
 		expect(handler).toHaveBeenCalled();
 	});
 
-	test('should grant if `onStartShouldSetPanResponder()` function returns true', async () => {
+	test('should grant if `onStartShouldSet()` function returns true', async () => {
 		const handler = jest.fn();
-		const shouldSetPanResponder = (ev, gestureState) => gestureState.x0 > 100;
+		const shouldSet = (ev, gestureState) => gestureState.x0 > 100;
 		const wrapper = mount(
-			<PanResponder
-				onPanResponderGrant={handler}
-				onStartShouldSetPanResponder={shouldSetPanResponder}
-			>
+			<PanResponder onGrant={handler} onStartShouldSet={shouldSet}>
 				{(ref) => <div ref={ref} />}
 			</PanResponder>,
 		);
@@ -54,14 +51,11 @@ describe('onStartShouldSetPanResponder', function () {
 		expect(handler).toHaveBeenCalledTimes(2);
 	});
 
-	test('should `onStartShouldSetPanResponder()` `gestureState` work', async () => {
+	test('should `onStartShouldSet()` `gestureState` work', async () => {
 		const handler = jest.fn();
 		const touchClient = { pageX: 100, pageY: 200 };
 		const wrapper = mount(
-			<PanResponder
-				onPanResponderGrant={handler}
-				onStartShouldSetPanResponder={handler}
-			>
+			<PanResponder onGrant={handler} onStartShouldSet={handler}>
 				{(ref) => <div ref={ref} />}
 			</PanResponder>,
 		);

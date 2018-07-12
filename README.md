@@ -17,18 +17,18 @@ Low level pan gesture responder React component for DOM. This library is highly 
   - [Event](#event)
   - [GestureState](#gesturestate)
 - [Properties](#properties)
-  - [onStartShouldSetPanResponder](#onstartshouldsetpanresponder)
-  - [onStartShouldSetPanResponderCapture](#onstartshouldsetpanrespondercapture)
-  - [onMoveShouldSetPanResponder](#onmoveshouldsetpanresponder)
-  - [onMoveShouldSetPanResponderCapture](#onmoveshouldsetpanrespondercapture)
-  - [onPanResponderGrant](#onpanrespondergrant)
-  - [onPanResponderReject](#onpanresponderreject)
-  - [onPanResponderStart](#onpanresponderstart)
-  - [onPanResponderMove](#onpanrespondermove)
-  - [onPanResponderEnd](#onpanresponderend)
-  - [onPanResponderRelease](#onpanresponderrelease)
-  - [onResponderTerminationRequest](#onresponderterminationrequest)
-  - [onResponderTerminate](#onresponderterminate)
+  - [onStartShouldSet](#onstartshouldset)
+  - [onStartShouldSetCapture](#onstartshouldsetcapture)
+  - [onMoveShouldSet](#onmoveshouldset)
+  - [onMoveShouldSetCapture](#onmoveshouldsetcapture)
+  - [onGrant](#ongrant)
+  - [onReject](#onreject)
+  - [onStart](#onstart)
+  - [onMove](#onmove)
+  - [onEnd](#onend)
+  - [onRelease](#onrelease)
+  - [onTerminationRequest](#onterminationrequest)
+  - [onTerminate](#onterminate)
   - [touchAction](#touchaction)
 - [License](#license)
 
@@ -59,10 +59,10 @@ import PanResponder from 'react-pan-responder';
 export default class MyApp extends Component {
   render() {
     <PanResponder
-      onStartShouldSetPanResponder={(event, gestureState) => true}
-      onPanResponderGrant={(event, gestureState) => {}}
-      onPanResponderMove={(event, gestureState) => {}}
-      onPanResponderRelease={(event, gestureState) => {}}
+      onStartShouldSet={(event, gestureState) => true}
+      onGrant={(event, gestureState) => {}}
+      onMove={(event, gestureState) => {}}
+      onRelease={(event, gestureState) => {}}
     >
       {(ref) =>
         <div ref={ref}>Awesome</div>
@@ -81,20 +81,20 @@ export default class MyApp extends Component {
 
 A view can become the touch responder by implementing the correct negotiation methods. There are two methods to ask the view if it wants to become responder:
 
-* `View.props.onStartShouldSetResponder: (event, gestureState) => true`, - Does this view want to become responder on the start of a touch?
-* `View.props.onMoveShouldSetResponder: (event, gestureState) => true`, - Called for every touch move on the View when it is not the responder: does this view want to "claim" touch responsiveness?
+* `View.props.onStartShouldSet: (event, gestureState) => true`, - Does this view want to become responder on the start of a touch?
+* `View.props.onMoveShouldSet: (event, gestureState) => true`, - Called for every touch move on the View when it is not the responder: does this view want to "claim" touch responsiveness?
 
 If the View returns true and attempts to become the responder, one of the following will happen:
 
-* `View.props.onResponderGrant: (event, gestureState) => {}` - The View is now responding for touch events. This is the time to highlight and show the user what is happening
-* `View.props.onResponderReject: (event, gestureState) => {}`  - Something else is the responder right now and will not release it
+* `View.props.onGrant: (event, gestureState) => {}` - The View is now responding for touch events. This is the time to highlight and show the user what is happening
+* `View.props.onReject: (event, gestureState) => {}`  - Something else is the responder right now and will not release it
 
 If the view is responding, the following handlers can be called:
 
-* `View.props.onResponderMove: (event, gestureState) => {}` - The user is moving their finger
-* `View.props.onResponderRelease: (event, gestureState) => {}` - Fired at the end of the touch, i.e. "touchUp"
-* `View.props.onResponderTerminationRequest: (event, gestureState) => true` - Something else wants to become responder. Should this view release the responder? Returning `true` allows release
-* `View.props.onResponderTerminate: (event, gestureState) => {}` - The responder has been taken by other views after a call to `onResponderTerminationRequest`
+* `View.props.onMove: (event, gestureState) => {}` - The user is moving their finger
+* `View.props.onRelease: (event, gestureState) => {}` - Fired at the end of the touch, i.e. "touchUp"
+* `View.props.onTerminationRequest: (event, gestureState) => true` - Something else wants to become responder. Should this view release the responder? Returning `true` allows release
+* `View.props.onTerminate: (event, gestureState) => {}` - The responder has been taken by other views after a call to `onTerminationRequest`
 
 
 ## Responder Handlers
@@ -102,7 +102,7 @@ If the view is responding, the following handlers can be called:
 It provides a predictable wrapper of the responder handlers provided by the gesture responder system. For each handler, it provides a new `gestureState` object alongside the native event object:
 
 ```js
-onPanResponderMove: (event, gestureState) => {}
+onMove: (event, gestureState) => {}
 ```
 
 ### Event
@@ -129,85 +129,85 @@ A gestureState object has the following:
 
 *All properties are optional*
 
-### onStartShouldSetPanResponder
+### onStartShouldSet
 
 `boolean|function`
 
 Deciding this component to become responder on the start of a touch. Defaults to `false`. If giving a function, it should return a `boolean`.
 
 
-### onStartShouldSetPanResponderCapture
+### onStartShouldSetCapture
 
 `boolean|function`
 
-Just like `onStartShouldSetPanResponder`, but using capture. Defaults to `false`.
+Just like `onStartShouldSet`, but using capture. Defaults to `false`.
 
 
-### onMoveShouldSetPanResponder
+### onMoveShouldSet
 
 `boolean|function`
 
 Deciding this component to become responder on every touch move on the View when it is not the responder. Defaults to `false`.
 
 
-### onMoveShouldSetPanResponderCapture
+### onMoveShouldSetCapture
 
 `boolean|function`
 
-Just like `onMoveShouldSetPanResponder`, but using capture. Defaults to `false`.
+Just like `onMoveShouldSet`, but using capture. Defaults to `false`.
 
 
-### onPanResponderGrant
+### onGrant
 
 `function`
 
 Fired when this component is now responding for touch events. This is the time to highlight and show the user what is happening.
 
-### onPanResponderReject
+### onReject
 
 `function`
 
 Fired when something else is the responder right now and will not release it
 
 
-### onPanResponderStart
+### onStart
 
 `function`
 
 Fired for every touch start when it is the responder.
 
 
-### onPanResponderMove
+### onMove
 
 `function`
 
 Fired for every touch move when it is the responder.
 
 
-### onPanResponderEnd
+### onEnd
 
 `function`
 
 Fired for every touch end when it is the responder.
 
 
-### onPanResponderRelease
+### onRelease
 
 `function`
 
 Fired at the end of the touch, i.e. "touchUp".
 
-### onResponderTerminationRequest
+### onTerminationRequest
 
 `boolean|function`
 
 Fired when something else wants to become responder. Should this view release the responder? Returning `true` allows release
 
-### onResponderTerminate
+### onTerminate
 
 `function`
 
-Fired when responder has been taken by other views after a call to `onResponderTerminationRequest`
+Fired when responder has been taken by other views after a call to `onTerminationRequest`
 
 ### touchAction
 

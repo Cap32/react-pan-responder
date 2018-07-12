@@ -3,20 +3,20 @@ import PanResponder from '../src';
 import Simulator from './utils/Simulator';
 import mount from './utils/mount';
 
-describe('onMoveShouldSetPanResponderCapture', function () {
-	test('should fire `onMoveShouldSetPanResponderCapture()` before fire `onMoveShouldSetPanResponder()`', async () => {
+describe('onStartShouldSetCapture', function () {
+	test('should fire `onStartShouldSetCapture()` before fire `onStartShouldSet()`', async () => {
 		const handler = jest.fn();
 		let childRef;
 		mount(
 			<PanResponder
-				onMoveShouldSetPanResponderCapture={() => handler(1)}
-				onMoveShouldSetPanResponder={() => handler(4)}
+				onStartShouldSetCapture={() => handler(1)}
+				onStartShouldSet={() => handler(4)}
 			>
 				{(ref) => (
 					<div ref={ref}>
 						<PanResponder
-							onMoveShouldSetPanResponderCapture={() => handler(2)}
-							onMoveShouldSetPanResponder={() => handler(3)}
+							onStartShouldSetCapture={() => handler(2)}
+							onStartShouldSet={() => handler(3)}
 							innerRef={(dom) => (childRef = dom)}
 						>
 							{(ref) => <div ref={ref} />}
@@ -27,7 +27,6 @@ describe('onMoveShouldSetPanResponderCapture', function () {
 		);
 		await Simulator.create(childRef)
 			.touchStart()
-			.touchMove()
 			.touchEnd()
 			.exec();
 		expect(handler).toHaveBeenNthCalledWith(1, 1);
@@ -36,14 +35,14 @@ describe('onMoveShouldSetPanResponderCapture', function () {
 		expect(handler).toHaveBeenNthCalledWith(4, 4);
 	});
 
-	test('should not fire `onMoveShouldSetPanResponder()` if `onMoveShouldSetPanResponderCapture()` returns true', async () => {
+	test('should not fire `onStartShouldSet()` if `onStartShouldSetCapture()` returns true', async () => {
 		const handler = jest.fn(() => true);
 		const captureHandler = jest.fn(() => true);
 		let childRef;
 		mount(
 			<PanResponder
-				onMoveShouldSetPanResponderCapture={captureHandler}
-				onMoveShouldSetPanResponder={handler}
+				onStartShouldSetCapture={captureHandler}
+				onStartShouldSet={handler}
 				innerRef={(dom) => (childRef = dom)}
 			>
 				{(ref) => <div ref={ref} />}
@@ -51,7 +50,6 @@ describe('onMoveShouldSetPanResponderCapture', function () {
 		);
 		await Simulator.create(childRef)
 			.touchStart()
-			.touchMove()
 			.touchEnd()
 			.exec();
 		expect(handler).toHaveBeenCalledTimes(0);

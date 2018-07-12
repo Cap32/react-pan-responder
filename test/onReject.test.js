@@ -3,14 +3,14 @@ import PanResponder from '../src';
 import Simulator from './utils/Simulator';
 import mount from './utils/mount';
 
-describe('onPanResponderReject', function () {
-	test('should not fire `onPanResponderReject()` by default', async () => {
+describe('onReject', function () {
+	test('should not fire `onReject()` by default', async () => {
 		const handler = jest.fn();
 		let childRef;
 		mount(
 			<PanResponder
-				onStartShouldSetPanResponder={() => true}
-				onPanResponderReject={handler}
+				onStartShouldSet={() => true}
+				onReject={handler}
 				innerRef={(dom) => (childRef = dom)}
 			>
 				{(ref) => <div ref={ref} />}
@@ -23,19 +23,16 @@ describe('onPanResponderReject', function () {
 		expect(handler).toHaveBeenCalledTimes(0);
 	});
 
-	test('should fire `onPanResponderReject()` when other responder `onPanResponderTerminationRequest()` returns `false`', async () => {
+	test('should fire `onReject()` when other responder `onTerminationRequest()` returns `false`', async () => {
 		const handler = jest.fn();
 		let childRef;
 		mount(
-			<PanResponder
-				onStartShouldSetPanResponder={() => true}
-				onPanResponderReject={handler}
-			>
+			<PanResponder onStartShouldSet={() => true} onReject={handler}>
 				{(ref) => (
 					<div ref={ref}>
 						<PanResponder
-							onStartShouldSetPanResponder={() => true}
-							onPanResponderTerminationRequest={() => false}
+							onStartShouldSet={() => true}
+							onTerminationRequest={() => false}
 							innerRef={(dom) => (childRef = dom)}
 						>
 							{(ref) => <div ref={ref} />}

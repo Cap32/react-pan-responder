@@ -16,33 +16,33 @@ export default class PanResponder extends Component {
 			PropTypes.func,
 			PropTypes.shape({ current: PropTypes.object }),
 		]),
-		onStartShouldSetPanResponderCapture: funcOrBool,
-		onStartShouldSetPanResponder: funcOrBool,
-		onMoveShouldSetPanResponderCapture: funcOrBool,
-		onMoveShouldSetPanResponder: funcOrBool,
-		onPanResponderTerminationRequest: funcOrBool,
-		onPanResponderStart: PropTypes.func,
-		onPanResponderGrant: PropTypes.func,
-		onPanResponderReject: PropTypes.func,
-		onPanResponderMove: PropTypes.func,
-		onPanResponderEnd: PropTypes.func,
-		onPanResponderRelease: PropTypes.func,
-		onPanResponderTerminate: PropTypes.func,
+		onStartShouldSetCapture: funcOrBool,
+		onStartShouldSet: funcOrBool,
+		onMoveShouldSetCapture: funcOrBool,
+		onMoveShouldSet: funcOrBool,
+		onTerminationRequest: funcOrBool,
+		onStart: PropTypes.func,
+		onGrant: PropTypes.func,
+		onReject: PropTypes.func,
+		onMove: PropTypes.func,
+		onEnd: PropTypes.func,
+		onRelease: PropTypes.func,
+		onTerminate: PropTypes.func,
 	};
 
 	static defaultProps = {
-		onPanResponderStart: noop,
-		onPanResponderGrant: noop,
-		onPanResponderMove: noop,
-		onPanResponderRelease: noop,
-		onPanResponderEnd: noop,
-		onPanResponderReject: noop,
-		onPanResponderTerminate: noop,
-		onStartShouldSetPanResponderCapture: false,
-		onStartShouldSetPanResponder: false,
-		onMoveShouldSetPanResponderCapture: false,
-		onMoveShouldSetPanResponder: false,
-		onPanResponderTerminationRequest: false,
+		onStart: noop,
+		onGrant: noop,
+		onMove: noop,
+		onRelease: noop,
+		onEnd: noop,
+		onReject: noop,
+		onTerminate: noop,
+		onStartShouldSetCapture: false,
+		onStartShouldSet: false,
+		onMoveShouldSetCapture: false,
+		onMoveShouldSet: false,
+		onTerminationRequest: false,
 		touchAction: 'none',
 	};
 
@@ -78,64 +78,64 @@ export default class PanResponder extends Component {
 	};
 
 	_handleShouldStartCapture = (...args) => {
-		const { onStartShouldSetPanResponderCapture: should } = this.props;
+		const { onStartShouldSetCapture: should } = this.props;
 		return isFunction(should) ? should(...args) : should;
 	};
 
 	_handleShouldStart = (...args) => {
-		const { onStartShouldSetPanResponder: should } = this.props;
+		const { onStartShouldSet: should } = this.props;
 		return isFunction(should) ? should(...args) : should;
 	};
 
 	_handleGrant = (...args) => {
-		const { onPanResponderGrant } = this.props;
-		onPanResponderGrant(...args);
+		const { onGrant } = this.props;
+		onGrant(...args);
 	};
 
 	_handleStart = (...args) => {
-		this.props.onPanResponderStart(...args);
+		this.props.onStart(...args);
 	};
 
 	_handleShouldMoveCapture = (...args) => {
-		const { onMoveShouldSetPanResponderCapture: should } = this.props;
+		const { onMoveShouldSetCapture: should } = this.props;
 		return isFunction(should) ? should(...args) : should;
 	};
 
 	_handleShouldMove = (...args) => {
-		const { onMoveShouldSetPanResponder: should } = this.props;
+		const { onMoveShouldSet: should } = this.props;
 		return isFunction(should) ? should(...args) : should;
 	};
 
 	_handleMove = (ev, gestureState) => {
-		const { onPanResponderMove, touchAction } = this.props;
+		const { onMove, touchAction } = this.props;
 		if (this._isTouchAction === null) {
 			this._isTouchAction = TouchActions[touchAction](gestureState);
 		}
 		if (!this._isTouchAction) {
 			ev.cancelable !== false && ev.preventDefault();
-			onPanResponderMove(ev, gestureState);
+			onMove(ev, gestureState);
 		}
 	};
 
 	_handleEnd = (...args) => {
-		this.props.onPanResponderEnd(...args);
+		this.props.onEnd(...args);
 	};
 
 	_handleRelease = (...args) => {
 		this._isTouchAction = null;
-		this.props.onPanResponderRelease(...args);
+		this.props.onRelease(...args);
 	};
 
 	_handleReject = (...args) => {
-		this.props.onPanResponderReject(...args);
+		this.props.onReject(...args);
 	};
 
 	_handleTerminate = (...args) => {
-		this.props.onPanResponderTerminate(...args);
+		this.props.onTerminate(...args);
 	};
 
 	_handleRequestTerminate = (...args) => {
-		const { onPanResponderTerminationRequest: should } = this.props;
+		const { onTerminationRequest: should } = this.props;
 		return isFunction(should) ? should(...args) : should;
 	};
 
