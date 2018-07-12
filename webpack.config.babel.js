@@ -85,7 +85,7 @@ module.exports = (webpackEnv = {}) => {
 		config.output = {
 			filename: `${name}${minify ? '.min' : ''}.js`,
 			path: resolve(__dirname, 'dist'),
-			library: 'ReactPanResponderView',
+			library: 'ReactPanResponder',
 			libraryTarget: 'umd',
 		};
 		config.externals = {

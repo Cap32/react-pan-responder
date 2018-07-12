@@ -1,9 +1,9 @@
 import React, { Component } from 'react';
-import PanResponderView from 'react-pan-responder-view';
+import PanResponder from 'react-pan-responder-view';
 
 export default class MyApp extends Component {
   render() {
-    <PanResponderView
+    <PanResponder
       onStartShouldSetPanResponder={(e, gestureState) => true}
       onStartShouldSetPanResponderCapture={(e, gestureState) => true}
       onMoveShouldSetPanResponderCapture={(e, gestureState) => true}
@@ -14,7 +14,7 @@ export default class MyApp extends Component {
       onPanResponderEnd={(e, gestureState) => {}}
       onPanResponderRelease={(e, gestureState) => {}}
     >
-      Awesome
-    </PanResponderView>
+      {(ref) => <h1 ref={ref}>Awesome</h1>}
+    </PanResponder>
   }
 }

@@ -1,8 +1,8 @@
 {
-  "name": "react-pan-responder-view",
+  "name": "react-pan-responder",
   "version": "0.0.0",
   "description": "React low level pan gesture component for DOM",
-  "repository": "Cap32/react-pan-responder-view",
+  "repository": "Cap32/react-pan-responder",
   "scripts": {
     "start": "cross-env BUILD_EXAMPLE=true webpack-dev-server",
     "watch": "cross-env BABEL_ENV=cjs jest --watchAll",

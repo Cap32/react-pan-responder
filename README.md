@@ -1,6 +1,6 @@
-# react-pan-responder-view
+# react-pan-responder
 
-[![Build Status](https://travis-ci.org/Cap32/react-pan-responder-view.svg?branch=master)](https://travis-ci.org/Cap32/react-pan-responder-view) [![Coverage Status](https://coveralls.io/repos/github/Cap32/react-pan-responder-view/badge.svg?branch=master)](https://coveralls.io/github/Cap32/react-pan-responder-view?branch=master) [![License](https://img.shields.io/badge/license-MIT_License-blue.svg?style=flat)](https://github.com/Cap32/react-pan-responder-view/blob/master/LICENSE.md)
+[![Build Status](https://travis-ci.org/Cap32/react-pan-responder.svg?branch=master)](https://travis-ci.org/Cap32/react-pan-responder) [![Coverage Status](https://coveralls.io/repos/github/Cap32/react-pan-responder/badge.svg?branch=master)](https://coveralls.io/github/Cap32/react-pan-responder?branch=master) [![License](https://img.shields.io/badge/license-MIT_License-blue.svg?style=flat)](https://github.com/Cap32/react-pan-responder/blob/master/LICENSE.md)
 
 Low level pan gesture responder React component for DOM. This library is highly inspired by [React Native PanResponder](http://facebook.github.io/react-native/docs/panresponder.html).
 
@@ -47,7 +47,7 @@ Low level pan gesture responder React component for DOM. This library is highly 
 ### Installation
 
 ```bash
-$ yarn add react-pan-responder-view
+$ yarn add react-pan-responder
 ```
 
 
@@ -55,11 +55,11 @@ $ yarn add react-pan-responder-view
 
 ```js
 import React, { Component } from 'react';
-import PanResponderView from 'react-pan-responder-view';
+import PanResponder from 'react-pan-responder';
 
 export default class MyApp extends Component {
   render() {
-    <PanResponderView
+    <PanResponder
       onStartShouldSetPanResponder={(event, gestureState) => true}
       onPanResponderGrant={(event, gestureState) => {}}
       onPanResponderMove={(event, gestureState) => {}}
@@ -68,14 +68,14 @@ export default class MyApp extends Component {
       {(ref) =>
         <div ref={ref}>Awesome</div>
       }
-    </PanResponderView>
+    </PanResponder>
   }
 }
 ```
 
 ### Demo
 
-[https://cap32.github.io/react-pan-responder-view/](https://cap32.github.io/react-pan-responder-view/)
+[https://cap32.github.io/react-pan-responder/](https://cap32.github.io/react-pan-responder/)
 
 
 ## Responder Lifecycle
