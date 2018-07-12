@@ -301,7 +301,7 @@ class App extends Component {
 					<div className="footer-right">
 						<a
 							className="button"
-							href="https://github.com/Cap32/react-pan-responder-view"
+							href="https://github.com/Cap32/react-pan-responder"
 						>
 							<Github size={22} color="white" />
 						</a>
