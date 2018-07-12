@@ -1,10 +1,18 @@
+sudo: required
+
+services:
+  - docker
+
 language: node_js
 
 node_js:
-  - "8"
+  - 8
 
 scripts:
-  - yarn test --coverage
+  - yarn coverage
 
 after_script:
   - yarn coveralls
+
+notifications:
+  email: false

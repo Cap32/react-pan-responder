@@ -7,6 +7,7 @@
     "start": "cross-env BUILD_EXAMPLE=true webpack-dev-server",
     "watch": "cross-env BABEL_ENV=cjs jest --watchAll",
     "test": "cross-env BABEL_ENV=cjs jest",
+    "coverage": "cross-env BABEL_ENV=cjs jest --coverage",
     "coveralls": "cat ./coverage/lcov.info | coveralls",
     "rimraf": "rimraf ./dist ./lib ./es",
     "mkdir": "mkdirp ./dist ./lib ./es",
