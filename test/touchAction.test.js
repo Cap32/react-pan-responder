@@ -3,14 +3,12 @@ import PanResponder from '../src';
 import Simulator from './utils/Simulator';
 import mount from './utils/mount';
 
-describe('directionalLock', function () {
-	const { DirectionalLock } = PanResponder;
-
-	test('should fire `onPanResponderMove` if `DirectionalLock.both` and panning horizontally', async () => {
+describe('touchAction', function () {
+	test('should fire `onPanResponderMove` if touchAction is "none" and panning horizontally', async () => {
 		const handler = jest.fn();
 		const wrapper = mount(
 			<PanResponder
-				directionalLock={DirectionalLock.both}
+				touchAction="none"
 				onStartShouldSetPanResponder
 				onPanResponderMove={handler}
 			>
@@ -26,11 +24,11 @@ describe('directionalLock', function () {
 		expect(handler).toHaveBeenCalledTimes(2);
 	});
 
-	test('should fire `onPanResponderMove` if `DirectionalLock.both` and panning vertically', async () => {
+	test('should fire `onPanResponderMove` if touchAction is "none" and panning vertically', async () => {
 		const handler = jest.fn();
 		const wrapper = mount(
 			<PanResponder
-				directionalLock={DirectionalLock.both}
+				touchAction="none"
 				onStartShouldSetPanResponder
 				onPanResponderMove={handler}
 			>
@@ -46,11 +44,11 @@ describe('directionalLock', function () {
 		expect(handler).toHaveBeenCalledTimes(2);
 	});
 
-	test('should fire `onPanResponderMove` if `DirectionalLock.x` and panning horizontally', async () => {
+	test('should fire `onPanResponderMove` if touchAction is "x" and panning horizontally', async () => {
 		const handler = jest.fn();
 		const wrapper = mount(
 			<PanResponder
-				directionalLock={DirectionalLock.x}
+				touchAction="x"
 				onStartShouldSetPanResponder
 				onPanResponderMove={handler}
 			>
@@ -58,7 +56,7 @@ describe('directionalLock', function () {
 			</PanResponder>,
 		);
 		await Simulator.create(wrapper.find(PanResponder).getDOMNode())
-			.touchStart()
+			.touchStart({ pageX: 0, pageY: 0 })
 			.touchMove({ pageX: 10, pageY: 20 })
 			.touchMove({ pageX: 100, pageY: 20 })
 			.touchEnd()
@@ -66,11 +64,11 @@ describe('directionalLock', function () {
 		expect(handler).toHaveBeenCalledTimes(2);
 	});
 
-	test('should not fire `onPanResponderMove` if `DirectionalLock.x` and panning vertically', async () => {
+	test('should not fire `onPanResponderMove` if touchAction is "x" and panning vertically', async () => {
 		const handler = jest.fn();
 		const wrapper = mount(
 			<PanResponder
-				directionalLock={DirectionalLock.x}
+				touchAction="x"
 				onStartShouldSetPanResponder
 				onPanResponderMove={handler}
 			>
@@ -78,7 +76,7 @@ describe('directionalLock', function () {
 			</PanResponder>,
 		);
 		await Simulator.create(wrapper.find(PanResponder).getDOMNode())
-			.touchStart()
+			.touchStart({ pageX: 0, pageY: 0 })
 			.touchMove({ pageX: 20, pageY: 10 })
 			.touchMove({ pageX: 20, pageY: 100 })
 			.touchEnd()
@@ -86,11 +84,11 @@ describe('directionalLock', function () {
 		expect(handler).toHaveBeenCalledTimes(0);
 	});
 
-	test('should fire `onPanResponderMove` if `DirectionalLock.y` and panning vertically', async () => {
+	test('should fire `onPanResponderMove` if touchAction is "y" and panning vertically', async () => {
 		const handler = jest.fn();
 		const wrapper = mount(
 			<PanResponder
-				directionalLock={DirectionalLock.y}
+				touchAction="y"
 				onStartShouldSetPanResponder
 				onPanResponderMove={handler}
 			>
@@ -98,7 +96,7 @@ describe('directionalLock', function () {
 			</PanResponder>,
 		);
 		await Simulator.create(wrapper.find(PanResponder).getDOMNode())
-			.touchStart()
+			.touchStart({ pageX: 0, pageY: 0 })
 			.touchMove({ pageX: 20, pageY: 10 })
 			.touchMove({ pageX: 20, pageY: 100 })
 			.touchEnd()
@@ -106,11 +104,11 @@ describe('directionalLock', function () {
 		expect(handler).toHaveBeenCalledTimes(2);
 	});
 
-	test('should not fire `onPanResponderMove` if `DirectionalLock.y` and panning horizontally', async () => {
+	test('should not fire `onPanResponderMove` if touchAction is "y" and panning horizontally', async () => {
 		const handler = jest.fn();
 		const wrapper = mount(
 			<PanResponder
-				directionalLock={DirectionalLock.y}
+				touchAction="y"
 				onStartShouldSetPanResponder
 				onPanResponderMove={handler}
 			>
@@ -118,7 +116,7 @@ describe('directionalLock', function () {
 			</PanResponder>,
 		);
 		await Simulator.create(wrapper.find(PanResponder).getDOMNode())
-			.touchStart()
+			.touchStart({ pageX: 0, pageY: 0 })
 			.touchMove({ pageX: 10, pageY: 20 })
 			.touchMove({ pageX: 100, pageY: 20 })
 			.touchEnd()

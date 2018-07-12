@@ -29,8 +29,7 @@ Low level pan gesture responder React component for DOM. This library is highly 
   - [onPanResponderRelease](#onpanresponderrelease)
   - [onResponderTerminationRequest](#onresponderterminationrequest)
   - [onResponderTerminate](#onresponderterminate)
-  - [directionalLock](#directionallock)
-  - [static DirectionalLock](#static-directionallock)
+  - [touchAction](#touchaction)
 - [License](#license)
 
 
@@ -210,22 +209,15 @@ Fired when something else wants to become responder. Should this view release th
 
 Fired when responder has been taken by other views after a call to `onResponderTerminationRequest`
 
-### directionalLock
+### touchAction
 
 `string`
 
-Disable browser handling (i.e. scrolling). The value could be one of `DirectionalLock.both` (default), `DirectionalLock.x`, `DirectionalLock.y` or `DirectionalLock.none`. See the following for detail.
+Defining responder panning action. The value could be one of following string:
 
-
-### static DirectionalLock
-
-An helper object for `directionalLock`:
-
-- `both`: Disable browser handling of all panning gestures.
+- `none`: Disable browser handling of all panning gestures (default).
 - `x`: Enable single-finger horizontal panning gestures for browser handling.
 - `y`: Enable single-finger vertical panning gestures for browser handling.
-- `none`: Enable browser handling of all panning gestures.
-
 
 ## License
 
