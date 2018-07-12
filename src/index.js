@@ -1,13 +1,13 @@
 import { Component } from 'react';
 import PropTypes from 'prop-types';
-import TouchActions from './TouchActions';
+import DirectionalLock from './DirectionalLock';
 import delegation from './delegation';
 import { isFunction, isObject, noop } from './utils';
 
 const funcOrBool = PropTypes.oneOfType([PropTypes.func, PropTypes.bool]);
 
-const TouchActionTypes = Object.keys(TouchActions);
-const TouchActionNames = TouchActionTypes.reduce((actions, key) => {
+const DirectionalLockTypes = Object.keys(DirectionalLock);
+const DirectionalLockNames = DirectionalLockTypes.reduce((actions, key) => {
 	actions[key] = key;
 	return actions;
 }, {});
@@ -15,7 +15,7 @@ const TouchActionNames = TouchActionTypes.reduce((actions, key) => {
 export default class PanResponder extends Component {
 	static propTypes = {
 		children: PropTypes.func.isRequired,
-		touchAction: PropTypes.oneOf(TouchActionTypes),
+		directionalLock: PropTypes.oneOf(DirectionalLockTypes),
 		innerRef: PropTypes.oneOfType([
 			PropTypes.func,
 			PropTypes.shape({ current: PropTypes.object }),
@@ -47,12 +47,12 @@ export default class PanResponder extends Component {
 		onMoveShouldSetPanResponderCapture: false,
 		onMoveShouldSetPanResponder: false,
 		onPanResponderTerminationRequest: false,
-		touchAction: TouchActionNames.none,
+		directionalLock: DirectionalLockNames.both,
 	};
 
-	static TouchActions = TouchActionNames;
+	static DirectionalLock = DirectionalLockNames;
 
-	_locking = null;
+	_isLocked = null;
 
 	componentDidMount() {
 		this._handlers = {
@@ -113,11 +113,12 @@ export default class PanResponder extends Component {
 	};
 
 	_handleMove = (ev, gestureState) => {
-		const { onPanResponderMove, touchAction } = this.props;
-		if (this._locking === null) {
-			this._locking = TouchActions[touchAction](gestureState);
+		const { onPanResponderMove, directionalLock } = this.props;
+		if (this._isLocked === null) {
+			const lock = DirectionalLock[directionalLock];
+			this._isLocked = isFunction(lock) ? lock(gestureState) : lock;
 		}
-		if (this._locking) return;
+		if (!this._isLocked) return;
 		ev.cancelable !== false && ev.preventDefault();
 		onPanResponderMove(ev, gestureState);
 	};
@@ -127,7 +128,7 @@ export default class PanResponder extends Component {
 	};
 
 	_handleRelease = (...args) => {
-		this._locking = null;
+		this._isLocked = null;
 		this.props.onPanResponderRelease(...args);
 	};
 
