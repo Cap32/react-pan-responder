@@ -30,6 +30,7 @@ Low level pan gesture responder React component for DOM. This library is highly 
   - [onTerminationRequest](#onterminationrequest)
   - [onTerminate](#onterminate)
   - [touchAction](#touchaction)
+  - [innerRef](#innerref)
 - [License](#license)
 
 
@@ -201,13 +202,13 @@ Fired at the end of the touch, i.e. "touchUp".
 
 `boolean|function`
 
-Fired when something else wants to become responder. Should this view release the responder? Returning `true` allows release
+Fired when something else wants to become responder. Should this view release the responder? Returning `true` allows release.
 
 ### onTerminate
 
 `function`
 
-Fired when responder has been taken by other views after a call to `onTerminationRequest`
+Fired when responder has been taken by other views after a call to `onTerminationRequest`.
 
 ### touchAction
 
@@ -218,6 +219,12 @@ Defining responder panning action. The value could be one of following string:
 - `none`: Disable browser handling of all panning gestures (default).
 - `x`: Enable single-finger horizontal panning gestures for browser handling.
 - `y`: Enable single-finger vertical panning gestures for browser handling.
+
+### innerRef
+
+`function`
+
+Use this to access the internal component ref.
 
 ## License
 
