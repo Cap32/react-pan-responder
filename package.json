@@ -1,5 +1,5 @@
 {
-  "name": "react-pan-responder",
+  "name": "@cantonjs/react-pan-responder",
   "version": "0.1.0",
   "description": "React low level pan gesture component for DOM",
   "repository": "Cap32/react-pan-responder",

@@ -47,7 +47,7 @@ Low level pan gesture responder React component for DOM. This library is highly 
 ### Installation
 
 ```bash
-$ yarn add react-pan-responder
+$ yarn add @cantonjs/react-pan-responder
 ```
 
 
@@ -55,7 +55,7 @@ $ yarn add react-pan-responder
 
 ```js
 import React, { Component } from 'react';
-import PanResponder from 'react-pan-responder';
+import PanResponder from '@cantonjs/react-pan-responder';
 
 export default class MyApp extends Component {
   render() {
