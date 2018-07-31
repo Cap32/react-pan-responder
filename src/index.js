@@ -47,6 +47,7 @@ export default class PanResponder extends Component {
 	};
 
 	_isTouchAction = null;
+	_removeListener = noop;
 
 	componentDidMount() {
 		this._handlers = {
